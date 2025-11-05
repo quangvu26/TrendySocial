@@ -86,5 +86,23 @@ public class AuthService {
         return jwtService.genToken(user.getEmail());
     }
 
+    // Utility: check if email exists
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    // Utility: check if id exists (id is the username in this project)
+    public boolean existsById(String id){
+        return userRepository.existsById(id);
+    }
+
+    // Reset password for given email (used after verification code is validated)
+    public void resetPassword(String email, String newPassword){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 
 }

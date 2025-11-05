@@ -43,6 +43,7 @@
                 placeholder="Email hoặc số điện thoại"
                 required
               />
+              <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
             </div>
 
             <div>
@@ -53,10 +54,11 @@
                 placeholder="Mật khẩu"
                 required
               />
+              <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
             </div>
-
+            <p v-if="error" class="mt-2 text-center text-sm text-red-600">{{ error }}</p>
             <div class="flex justify-end">
-              <a href="#" class="text-sm text-gray-600 hover:text-[#FF5630]"
+              <a href="/forgot-password" class="text-sm text-gray-600 hover:text-[#FF5630]"
                 >Quên mật khẩu?</a>
             </div>
 
@@ -95,10 +97,6 @@
                 class="font-medium text-[#FF5630] hover:text-[#ff6647]"
                 >Đăng ký</a>
             </div>
-
-            <p v-if="error" class="mt-2 text-center text-sm text-red-600">
-              {{ error }}
-            </p>
           </form>
         </div>
       </div>
@@ -109,16 +107,36 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { login } from "../api/authService";
+import { login, checkEmail } from "../api/authService";
 // import { getGoogleIdToken } from '../utils/googleAuth';
 
 const router = useRouter();
 const email = ref("");
 const password = ref("");
+const errors = ref({ email: null, password: null });
 const error = ref("");
 // Trong <script setup> của component
 const handleLogin = async () => {
   try {
+    // reset errors
+    errors.value.email = null;
+    errors.value.password = null;
+    // If the input looks like an email, check if it exists before attempting login
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
+    if (isEmail) {
+      try {
+        const checkRes = await checkEmail(email.value);
+        const exists = checkRes?.data?.exists;
+        if (!exists) {
+          errors.value.email = "Email này chưa được đăng ký. Vui lòng đăng ký trước khi đăng nhập.";
+          return;
+        }
+      } catch (e) {
+        // If check fails, continue to try login and let server handle errors
+        console.warn('Không thể kiểm tra email trước khi đăng nhập:', e);
+      }
+    }
+
     const res = await login({ email: email.value, password: password.value });
     console.log("Login response:", res.data);
     localStorage.setItem("token", res.data.token);
@@ -129,34 +147,19 @@ const handleLogin = async () => {
     if (err.response) {
       // Nếu có phản hồi lỗi từ server (ví dụ: 401 Unauthorized)
       if (err.response.status === 401) {
-        error.value = "Email hoặc mật khẩu không chính xác.";
+        // cụ thể: sai mật khẩu
+        errors.value.password = "Mật khẩu không chính xác.";
       } else {
         // Các lỗi khác từ server
         const serverMessage = err.response.data?.message || err.response.data;
         error.value = `Lỗi từ máy chủ: ${serverMessage || 'Không có thông tin chi tiết'}`;
       }
-    } else if (err.request) {
-      // Nếu request được gửi đi nhưng không nhận được phản hồi
-      error.value = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.";
-    } else {
-      // Lỗi khác (ví dụ: lỗi cài đặt request)
-      error.value = "Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại.";
     }
-    // Thêm một gợi ý chung
-    error.value += "\nNếu bạn chưa có tài khoản, hãy chắc chắn rằng bạn đã hoàn tất quá trình đăng ký.";
   }
 };
 
 const handleGoogleLogin = () => {
-  // Start server-side OAuth2 flow handled by the backend (Spring Security)
-  // Backend default: http://localhost:8080
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
-  // The Spring Security authorization endpoint for Google is usually:
-  // /oauth2/authorization/google
   window.location.href = `${BACKEND_URL}/oauth2/authorization/google`;
 };
 </script>
-
-<style scoped>
-/* Các styles đã được chuyển thành Tailwind utility classes trong template */
-</style>

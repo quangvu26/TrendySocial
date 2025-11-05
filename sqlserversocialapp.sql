@@ -195,3 +195,4 @@ CREATE TABLE [notification] (
     FOREIGN KEY (id_nguoi_nhan) REFERENCES [nguoi_dung](id_user)
 );
 SELECT*FROM nguoi_dung
+DELETE FROM nguoi_dung

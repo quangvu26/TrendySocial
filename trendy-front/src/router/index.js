@@ -4,6 +4,7 @@ import LoginView from "../components/LoginView.vue";
 import RegisterOauth2View from "../components/RegisterOauth2View.vue";
 import Redirect from "../components/Redirect.vue";
 import RegisterView from "../components/RegisterView.vue";
+import ForgotPassword from "../components/ForgotPassword.vue";
 const routes = [
   {
     path: "/",
@@ -22,8 +23,6 @@ const routes = [
     component: RegisterView,
   },
   {
-    // Route used by backend OAuth2 redirect: backend will redirect to
-    // https://localhost:5173/trendy/auth/oauth2/redirect?token=... (see backend)
     path: "/trendy/auth/oauth2/redirect",
     name: "oauth2-redirect",
     component: Redirect,
@@ -35,6 +34,10 @@ const routes = [
   {
     path: "/chat",
     component: HomeView,
+  },
+  {
+    path: "/forgot-password",
+    component: ForgotPassword,
   },
 ];
 const router = createRouter({

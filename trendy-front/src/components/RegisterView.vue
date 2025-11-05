@@ -59,11 +59,11 @@
                   <input
                     v-model="form.email"
                     type="email"
-                    :readonly="!!oauthData"
                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FF5630] focus:border-[#FF5630] sm:text-sm"
                     placeholder="Email của bạn"
                     required
                   />
+                  <p v-if="errors.email" class="text-sm text-red-600 mt-1">{{ errors.email }}</p>
                 </div>
                 <div>
                   <input
@@ -82,6 +82,7 @@
                     placeholder="ID người dùng"
                     required
                   />
+                  <p v-if="errors.id" class="text-sm text-red-600 mt-1">{{ errors.id }}</p>
                 </div>
 
                 <div class="space-y-2">
@@ -127,12 +128,23 @@
                     placeholder="Mật khẩu"
                     required
                   />
+                  <p v-if="errors.password" class="text-sm text-red-600 mt-1">{{ errors.password }}</p>
                 </div>
                 <button
                   type="submit"
-                  class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#FF5630] hover:bg-[#ff6647] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5630]"
+                  :disabled="isLoading"
+                  class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#FF5630] hover:bg-[#ff6647] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5630] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Tiếp
+                  <template v-if="isLoading">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Đang kiểm tra...
+                  </template>
+                  <template v-else>
+                    Tiếp
+                  </template>
                 </button>
               </form>
             </div>
@@ -267,18 +279,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   register,
   sendVerificationCode,
   verifyEmailCode,
+  checkEmail,
+  checkId,
 } from "../api/authService";
 
 const router = useRouter();
 const currentStep = ref(1);
 const error = ref("");
-const oauthData = ref(null);
 
 const form = ref({
   id: "",
@@ -289,32 +302,18 @@ const form = ref({
   ngaySinh: "",
 });
 
+const errors = ref({});
+
 // UI / state refs
 const isImageChanging = ref(false);
 const resendTimer = ref(0);
 const verificationCode = ref("");
 const isLoading = ref(false);
 
-onMounted(() => {
-  // Nếu có data từ OAuth, điền vào form
-  try {
-    const raw = sessionStorage.getItem("oauthUser");
-    if (raw) {
-      oauthData.value = JSON.parse(raw);
-      form.value.email = oauthData.value.email || "";
-      form.value.ten = oauthData.value.name || "";
-      // Đề xuất ID từ email
-      if (!form.value.id && oauthData.value.email) {
-        form.value.id = oauthData.value.email.split("@")[0];
-      }
-    }
-  } catch (e) {
-    console.error("Lỗi khi đọc dữ liệu OAuth:", e);
-  }
-});
 
 const validateStep = () => {
   error.value = "";
+  errors.value = {};
 
   // Step 1: basic info + password
   if (currentStep.value === 1) {
@@ -331,7 +330,12 @@ const validateStep = () => {
       return false;
     }
     if (form.value.password.length < 6) {
-      error.value = "Mật khẩu phải có ít nhất 6 ký tự";
+      errors.value.password = "Mật khẩu phải có ít nhất 6 ký tự";
+      return false;
+    }
+    // If id uniqueness check found an error, block
+    if (errors.value.id) {
+      error.value = 'Vui lòng sửa lỗi ở mục ID người dùng';
       return false;
     }
   }
@@ -347,17 +351,50 @@ const validateStep = () => {
   return true;
 };
 
-const nextStep = () => {
+const nextStep = async () => {
   if (!validateStep()) return;
 
   isImageChanging.value = true;
 
-  // Flow:
-  // - If currently on step 1 (basic info + password), just go to step 2 (ngày sinh)
-  // - If on step 2, send verification code and then go to step 3
+  // If currently on step 1, perform async uniqueness checks (email + id)
   if (currentStep.value === 1) {
-    currentStep.value++;
-    return;
+    isLoading.value = true;
+    error.value = "";
+    errors.value.email = null;
+    errors.value.id = null;
+    try {
+      // check email only when input looks like an email
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
+        const res = await checkEmail(form.value.email);
+        const exists = res?.data?.exists;
+        if (exists) {
+          errors.value.email = "Email này đã được sử dụng";
+        }
+      }
+
+      // check id uniqueness
+      const resId = await checkId(form.value.id);
+      const idExists = resId?.data?.exists;
+      if (idExists) {
+        errors.value.id = 'ID này đã tồn tại';
+      }
+
+      if (errors.value.email || errors.value.id) {
+        error.value = 'Vui lòng sửa các lỗi trước khi tiếp tục';
+        isLoading.value = false;
+        return;
+      }
+
+      // passed uniqueness checks -> advance to step 2
+      currentStep.value++;
+      isLoading.value = false;
+      return;
+    } catch (err) {
+      console.error('Lỗi khi kiểm tra email/ID:', err);
+      error.value = 'Lỗi khi kiểm tra thông tin. Vui lòng thử lại.';
+      isLoading.value = false;
+      return;
+    }
   }
 
   if (currentStep.value === 2) {
@@ -384,6 +421,13 @@ const handleVerificationStep = async () => {
   error.value = "";
   isLoading.value = true;
   try {
+    // ensure id is unique before registering
+    await checkIdUnique();
+    if (errors.value.id) {
+      error.value = errors.value.id;
+      isLoading.value = false;
+      return;
+    }
     // tạo user trước (status = true / false tùy bạn)
     await register(form.value);
 
@@ -400,6 +444,21 @@ const handleVerificationStep = async () => {
   }
 };
 
+const checkIdUnique = async () => {
+  errors.value.id = null;
+  if (!form.value.id) return;
+  try {
+    const res = await checkId(form.value.id);
+    const exists = res?.data?.exists;
+    if (exists) {
+      errors.value.id = 'ID này đã tồn tại';
+    }
+  } catch (e) {
+    // ignore or set error
+    errors.value.id = 'Không thể kiểm tra ID';
+  }
+};
+
 const startResendTimer = () => {
   resendTimer.value = 60;
   const timer = setInterval(() => {
@@ -413,7 +472,7 @@ const startResendTimer = () => {
 const resendCode = async () => {
   if (resendTimer.value > 0) return;
   try {
-    await sendVerificationCode(form.value);
+    await sendVerificationCode(form.value.email);
     startResendTimer();
   } catch (err) {
     error.value = err?.response?.data?.message || "Không thể gửi lại mã";

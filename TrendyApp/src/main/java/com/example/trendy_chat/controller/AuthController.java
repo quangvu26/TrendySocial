@@ -45,6 +45,26 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("token", token));
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email){
+        boolean exists = authService.existsByEmail(email);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @GetMapping("/check-id/{id}")
+    public ResponseEntity<Map<String, Boolean>> checkId(@PathVariable String id){
+        boolean exists = authService.existsById(id);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body){
+        String email = body.get("email");
+        String password = body.get("password");
+        authService.resetPassword(email, password);
+        return ResponseEntity.ok("OK");
+    }
+
 
 
 

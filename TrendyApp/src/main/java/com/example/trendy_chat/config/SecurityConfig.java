@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/trendy/auth/register", "/trendy/auth/login").permitAll()
-                        .requestMatchers("/trendy/auth/send-verify-code", "/trendy/auth/verify-code").permitAll()
+                        .requestMatchers("/trendy/auth/send-verify-code", "/trendy/auth/verify-code", "/trendy/auth/check-email", "/trendy/auth/check-id/**", "/trendy/auth/reset-password").permitAll()
                         .requestMatchers("/oauth2/authorization/**").permitAll()
                         .anyRequest().authenticated()
                 )
