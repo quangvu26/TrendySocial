@@ -49,7 +49,6 @@
             >
               {{ verifying ? 'Xác nhận...' : 'Xác nhận' }}
             </button>
-            <button @click="goToLogin" class="flex-1 border border-gray-300 py-2 rounded">Đăng nhập</button>
           </div>
         </div>
 
@@ -191,6 +190,4 @@ const onResetPassword = async () => {
 const prevStep = () => {
   step.value = 1;
 };
-
-const goToLogin = () => router.push('/login');
 </script>

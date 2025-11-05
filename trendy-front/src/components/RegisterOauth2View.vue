@@ -80,7 +80,7 @@
             class="w-full px-3 py-2 border rounded"
           />
         </div>
-        <div class="flex justify-end justify-center">
+        <div class="flex justify-center">
           <button
             type="submit"
             class="px-4 py-2 bg-[#FF5630] text-white rounded"

@@ -144,16 +144,36 @@ const handleLogin = async () => {
     router.push("/chat");
   } catch (err) {
     console.error("Lỗi đăng nhập:", err);
+    // Reset all errors first
+    error.value = "";
+    errors.value.email = null;
+    errors.value.password = null;
+
     if (err.response) {
-      // Nếu có phản hồi lỗi từ server (ví dụ: 401 Unauthorized)
-      if (err.response.status === 401) {
-        // cụ thể: sai mật khẩu
-        errors.value.password = "Mật khẩu không chính xác.";
-      } else {
-        // Các lỗi khác từ server
-        const serverMessage = err.response.data?.message || err.response.data;
-        error.value = `Lỗi từ máy chủ: ${serverMessage || 'Không có thông tin chi tiết'}`;
+      switch (err.response.status) {
+        case 401:
+          errors.value.password = "Mật khẩu không chính xác cho email này";
+          break;
+        case 404:
+          errors.value.email = "Email này chưa được đăng ký trong hệ thống";
+          break;
+        case 403:
+          error.value = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên";
+          break;
+        case 400:
+          if (err.response.data?.message?.includes("password")) {
+            errors.value.password = "Mật khẩu không đúng định dạng";
+          } else if (err.response.data?.message?.includes("email")) {
+            errors.value.email = "Email không đúng định dạng";
+          } else {
+            error.value = err.response.data?.message || "Thông tin đăng nhập không hợp lệ";
+          }
+          break;
+        default:
+          error.value = err.response.data?.message || "Có lỗi xảy ra khi đăng nhập";
       }
+    } else {
+      error.value = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại";
     }
   }
 };
