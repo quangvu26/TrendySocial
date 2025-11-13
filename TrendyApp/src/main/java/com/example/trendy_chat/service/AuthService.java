@@ -5,7 +5,8 @@ import com.example.trendy_chat.entity.User;
 import com.example.trendy_chat.exception.UnauthorizedException;
 import com.example.trendy_chat.mapper.UserMapper;
 import com.example.trendy_chat.repository.UserRepository;
-import org.apache.coyote.BadRequestException;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,9 @@ public class AuthService {
     JwtService jwtService;
     @Autowired
     EmailService emailService;
-    public UserResponse dangKy(RegisterRequest req) throws BadRequestException {
+    public UserResponse dangKy(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())){
-           throw new BadRequestException("Email đã tồn tại");
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã tồn tại");
         }
         User user = new User();
         user.setId(req.getId());
@@ -35,13 +36,16 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setGioiTinh(req.getGioiTinh());
         user.setNgaySinh(req.getNgaySinh());
-        user.setKieuDangNhap("LOCAL");
-        user.setTrangThai(false);
+        
+        // Set required fields with defaults
+        user.setKieuDangNhap(req.getKieuDangNhap() != null ? req.getKieuDangNhap() : "LOCAL");
+        user.setTrangThai(req.getTrangThai() != null ? req.getTrangThai() : false);
         user.setNgayTao(LocalDateTime.now());
+        
         userRepository.save(user);
         UserResponse resp = UserMapper.toResponse(user);
-        // Generate JWT token for the newly registered user so frontend can log in immediately
-        String token = jwtService.genToken(user.getEmail());
+        // Generate JWT token with id_user
+        String token = jwtService.genToken(user.getEmail(), user.getId());
         resp.setToken(token);
         return resp;
     }
@@ -50,31 +54,46 @@ public class AuthService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
             throw new UnauthorizedException("Sai mật khẩu");
         }
-        String token = jwtService.genToken(user.getEmail());
+        String token = jwtService.genToken(user.getEmail(), user.getId());
         UserResponse res = UserMapper.toResponse(user);
         res.setToken(token); // <-- set token vào response
         return res;
     }
+
+    /**
+     * Gửi mã xác nhận email
+     */
     public void sendVerifyCode(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
 
         String code = String.valueOf(new Random().nextInt(900_000) + 100_000);
-
         user.setMaXacNhan(code);
         user.setThoiGianHetHan(LocalDateTime.now().plusMinutes(5));
         userRepository.save(user);
 
         emailService.sendEmail(email, "Mã xác nhận", "Code: " + code);
     }
-    public String verifyCode(String email, String code){
+
+    /**
+     * Xác nhận mã và kích hoạt tài khoản - UNIFIED METHOD
+     */
+    public String verifyCode(String email, String code) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
 
-        if (user.getMaXacNhan() == null) throw new RuntimeException("Hãy gửi mã xác nhận trước");
-        if (!user.getMaXacNhan().equals(code)) throw new RuntimeException("Sai mã xác nhận");
-        if (user.getThoiGianHetHan() == null || user.getThoiGianHetHan().isBefore(LocalDateTime.now()))
+        if (user.getMaXacNhan() == null) {
+            throw new RuntimeException("Hãy gửi mã xác nhận trước");
+        }
+        
+        if (!user.getMaXacNhan().equals(code)) {
+            throw new RuntimeException("Sai mã xác nhận");
+        }
+        
+        if (user.getThoiGianHetHan() == null || 
+            user.getThoiGianHetHan().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Mã xác nhận đã hết hạn");
+        }
 
         // Kích hoạt tài khoản
         user.setTrangThai(true);
@@ -82,8 +101,19 @@ public class AuthService {
         user.setThoiGianHetHan(null);
         userRepository.save(user);
 
-        // Tạo token và trả về cho frontend để auto-login
+        // Trả về JWT token
         return jwtService.genToken(user.getEmail());
+    }
+
+    /**
+     * Reset mật khẩu sau khi verify code - UNIFIED METHOD
+     */
+    public void resetPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     // Utility: check if email exists
@@ -96,13 +126,16 @@ public class AuthService {
         return userRepository.existsById(id);
     }
 
-    // Reset password for given email (used after verification code is validated)
-    public void resetPassword(String email, String newPassword){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+    // utility to return full user response by email
+    public UserResponse getUserByEmail(String email) {
+        return userRepository.findByEmail(email).map(UserMapper::toResponse).orElse(null);
     }
 
+    public UserResponse getUserById(String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return null;
+        return UserMapper.toResponse(user);
+    }
 
 }
+

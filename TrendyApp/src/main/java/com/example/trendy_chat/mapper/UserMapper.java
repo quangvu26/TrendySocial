@@ -5,6 +5,10 @@ import com.example.trendy_chat.dto.UserResponse;
 import com.example.trendy_chat.entity.User;
 
 public class UserMapper {
+    
+    /**
+     * Convert RegisterRequest → User Entity
+     */
     public static User toEntity(RegisterRequest registerUser) {
         User user = new User();
         user.setId(registerUser.getId());
@@ -13,20 +17,26 @@ public class UserMapper {
         user.setPassword(registerUser.getPassword());
         user.setGioiTinh(registerUser.getGioiTinh());
         user.setNgaySinh(registerUser.getNgaySinh());
+        user.setKieuDangNhap("LOCAL");
+        user.setTrangThai(false);
         return user;
     }
-    public static UserResponse toResponse(User user){
-        UserResponse ur = new UserResponse();
-        ur.setId(user.getId());
-        ur.setTen(user.getTen());
-        ur.setEmail(user.getEmail());
-        ur.setAvatar(user.getAvatar());
-        ur.setTieuSu(user.getTieuSu());
-        ur.setGioiTinh(user.getGioiTinh());
-        ur.setKieuDangNhap(user.getKieuDangNhap());
-        ur.setNgaySinh(user.getNgaySinh());
-        ur.setTrangThai(user.getTrangThai());
-        ur.setNgayTao(user.getNgayTao());
-        return ur;
+
+    /**
+     * Convert User Entity → UserResponse DTO - HOÀN THIỆN đầy đủ field
+     */
+    public static UserResponse toResponse(User user) {
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setTen(user.getTen());
+        response.setEmail(user.getEmail());
+        response.setAvatar(user.getAvatar());
+        response.setTieuSu(user.getTieuSu());
+        response.setGioiTinh(user.getGioiTinh());
+        response.setNgaySinh(user.getNgaySinh());
+        response.setKieuDangNhap(user.getKieuDangNhap());
+        response.setTrangThai(user.getTrangThai());
+        response.setNgayTao(user.getNgayTao());
+        return response;
     }
 }

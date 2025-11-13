@@ -13,7 +13,10 @@ export const verifyEmailCode = (email, code) =>
   api.post("/trendy/auth/verify-code", { email, code });
 export const checkEmail = (email) =>
   api.get(`/trendy/auth/check-email?email=${encodeURIComponent(email)}`);
-export const checkId = (id) => api.get(`/trendy/auth/check-id/${encodeURIComponent(id)}`);
+export const checkId = (id) =>
+  api.get(`/trendy/auth/check-id/${encodeURIComponent(id)}`);
 export const resetPassword = (email, password) =>
   api.post(`/trendy/auth/reset-password`, { email, password });
 
+export const forgotPassword = (email) =>
+  api.post(`/trendy/auth/forgot-password`, { email });

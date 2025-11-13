@@ -14,4 +14,15 @@ export default defineConfig({
       ],
     },
   },
+  // Clear token when starting dev server
+  server: {
+    setupMiddleware(server) {
+      server.use((req, res, next) => {
+        if (process.env.NODE_ENV === 'development') {
+          localStorage.removeItem('token');
+        }
+        next();
+      });
+    }
+  }
 })

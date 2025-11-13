@@ -7,55 +7,119 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class JwtService {
+
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String secret;
 
     @Value("${jwt.expiration}")
-    private long expiration;
+    private Long expiration;
 
-    public String genToken(String email){
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime()+expiration);
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
+    /**
+     * Generate JWT token with email and userId
+     */
+    public String generateToken(String email, String userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("email", email);
+
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setClaims(claims)
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    /**
+     * Generate token with only userId (for token refresh)
+     */
+    public String generateToken(String userId) {
+        return generateToken(userId, userId);
+    }
+
+    /**
+     * Alias method - genToken(email, userId) for backward compatibility
+     */
+    public String genToken(String email, String userId) {
+        return generateToken(email, userId);
+    }
+
+    /**
+     * Alias method - genToken(email) for OAuth2
+     */
+    public String genToken(String email) {
+        return generateToken(email, email);
+    }
+
+    /**
+     * Extract userId from token (from subject)
+     */
+    public String extractUserId(String token) {
+        return extractClaims(token).getSubject();
+    }
+
+    /**
+     * Get user ID from token - same as extractUserId
+     */
+    public String getUserIdFromToken(String token) {
+        return extractUserId(token);
+    }
+
+    /**
+     * Extract email from token (from claims)
+     */
     public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-    public boolean validateToken(String token, String email) {
-        final String extractedEmail = extractEmail(token);
-        return (email.equals(extractedEmail) && !isTokenExpired(token));
-    }
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractClaims(token).get("email", String.class);
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    /**
+     * Validate token
+     */
+    public boolean validateToken(String token) {
+        try {
+            extractClaims(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            System.err.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    /**
+     * Check if token is expired
+     */
+    public boolean isTokenExpired(String token) {
+        try {
+            return extractClaims(token).getExpiration().before(new Date());
+        } catch (Exception e) {
+            System.err.println("Error checking token expiry: " + e.getMessage());
+            return true;
+        }
     }
 
-    private Claims extractAllClaims(String token) {
+    /**
+     * Extract all claims from token
+     */
+    private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes())
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 }
+
+
+

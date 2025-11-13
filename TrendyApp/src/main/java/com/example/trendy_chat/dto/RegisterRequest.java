@@ -35,4 +35,7 @@ public class RegisterRequest {
 
     @NotNull(message = "Ngày sinh không được để trống")
     private LocalDate ngaySinh;
+    // optional fields for OAuth registration
+    private String kieuDangNhap;
+    private Boolean trangThai;
 }

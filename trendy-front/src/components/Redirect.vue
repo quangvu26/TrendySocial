@@ -1,20 +1,32 @@
+<template>
+  <div class="flex justify-center items-center h-screen">
+    <h2>Đang đăng nhập, vui lòng chờ...</h2>
+  </div>
+</template>
+
 <script setup>
 import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
+import { saveToken, saveOAuthUser } from "../utils/authStorage";
 
 const route = useRoute();
 const router = useRouter();
 
 onMounted(async () => {
   try {
-    // Try query param first (backwards compatibility), then fragment (#token=...)
+    console.log("🔄 OAuth redirect handler started");
+    console.log("URL:", window.location.href);
+    console.log("Query params:", route.query);
+    console.log("Hash:", window.location.hash);
+
+    // Try URL query params first (?token=...)
     let token = route.query.token;
     let oauthEmail = route.query.email;
     let oauthName = route.query.name;
     let oauthAvatar = route.query.picture || route.query.avatar;
 
+    // Fallback: try URL fragment (#token=...)
     if (!token && !oauthEmail && window.location.hash) {
-      // hash is like #token=eyJ... or email=...&name=...&avatar=...
       const hash = window.location.hash.replace(/^#/, "");
       const params = new URLSearchParams(hash);
 
@@ -24,37 +36,40 @@ onMounted(async () => {
       oauthAvatar = params.get("picture") || params.get("avatar");
     }
 
-    if (token) {
-      console.log("Token found, redirecting to chat");
-      // Save token and navigate to chat. Use replace to remove token from history.
-      localStorage.setItem("token", token);
+    console.log(
+      "🔍 Redirect handling - token:",
+      !!token,
+      "oauth:",
+      !!oauthEmail
+    );
+
+    // Case 1: Has token → go to chat
+    if (token && token.trim().length > 0) {
+      console.log("✅ Token found, saving and redirecting to chat");
+      saveToken(token);
       await router.replace("/chat");
-    } else if (oauthEmail) {
-      console.log("OAuth data found, redirecting to register");
-      // Store oauth data temporarily and navigate to register completion form
+      return;
+    }
+
+    // Case 2: Has OAuth data → go to register
+    if (oauthEmail && oauthEmail.trim().length > 0) {
+      console.log("✅ OAuth data found, redirecting to register-oauth2");
       const oauthData = {
         email: decodeURIComponent(oauthEmail),
         name: oauthName ? decodeURIComponent(oauthName) : "",
         avatar: oauthAvatar ? decodeURIComponent(oauthAvatar) : "",
-        kieuDangNhap: "GOOGLE",
       };
-      sessionStorage.setItem("oauthUser", JSON.stringify(oauthData));
-      // navigate to OAuth registration page where user completes account
+      saveOAuthUser(oauthData);
       await router.replace("/register-oauth2");
-    } else {
-      console.log("No token or oauth data found, redirecting to login");
-      // No token or oauth data found -> go back to login
-      await router.replace("/login");
+      return;
     }
+
+    // Case 3: Nothing → go to login
+    console.warn("⚠️ No token or OAuth data found - redirecting to login");
+    await router.replace("/login");
   } catch (error) {
-    console.error("Error in OAuth redirect:", error);
+    console.error("❌ OAuth redirect error:", error);
     await router.replace("/login");
   }
 });
 </script>
-
-<template>
-  <div class="flex justify-center items-center h-screen">
-    <h2>Đang đăng nhập, vui lòng chờ...</h2>
-  </div>
-</template>
