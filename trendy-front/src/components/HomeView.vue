@@ -132,6 +132,7 @@
                 :userId="user?.id || user?.email"
                 :connectionState="chatConnectionState"
                 @sent="onSent"
+                @message-received="onMessageReceived"
                 @error="chatError = $event"
                 @hide-chat="handleHideChat"
                 @block-user="handleBlockUser"
@@ -1464,6 +1465,54 @@ const onSent = (payload) => {
   }
 };
 
+// ✅ Handle message received từ ChatWindow (WebSocket)
+const onMessageReceived = (data) => {
+  try {
+    const { chatId, chatType, lastMessage, time, sender } = data;
+
+    if (!chatId) return;
+
+    console.log(
+      "📨 Message received for chat:",
+      chatId,
+      "- Text:",
+      lastMessage
+    );
+
+    // Tìm chat cần cập nhật
+    const chatIdx = chats.value.findIndex(
+      (c) => c.id === chatId && c.type === chatType
+    );
+
+    if (chatIdx >= 0) {
+      // Cập nhật tin nhắn cuối cùng và thời gian
+      chats.value[chatIdx].lastMessage = lastMessage || "";
+      chats.value[chatIdx].time = time || new Date().toISOString();
+
+      // Nếu tin nhắn từ người khác (không phải của bạn), tăng unreadCount
+      const isFromOther = sender !== (user.value?.id || user.value?.email);
+      if (isFromOther) {
+        chats.value[chatIdx].unreadCount =
+          (chats.value[chatIdx].unreadCount || 0) + 1;
+        console.log(
+          "📌 Unread count for",
+          chatId,
+          ":",
+          chats.value[chatIdx].unreadCount
+        );
+      }
+
+      // Di chuyển lên đầu danh sách (chat mới nhất)
+      const chat = chats.value.splice(chatIdx, 1)[0];
+      chats.value.unshift(chat);
+
+      console.log("✅ Chat list updated and reordered");
+    }
+  } catch (e) {
+    console.error("Error in onMessageReceived:", e);
+  }
+};
+
 let panelListener = null;
 
 // Load chats from API
@@ -1633,6 +1682,115 @@ const loadChats = async () => {
   }
 };
 
+// ✅ Refresh chats list - Polling để lấy latest messages
+const lastFetchTime = ref(new Date());
+
+const refreshChatList = async () => {
+  if (!user.value?.id) return;
+
+  try {
+    const userId = user.value.id;
+
+    // Fetch solo chats from backend (now includes lastMessage and ngayGui)
+    const soloRes = await api.get(`/trendy/chat/solo?userId=${userId}`);
+    const groupRes = await api.get(`/trendy/chat/group?userId=${userId}`);
+
+    // Get list of current chat IDs
+    const newChatIds = [];
+
+    // Check solo chats
+    for (const c of soloRes.data || []) {
+      const chatKey = `private-${c.otherUserId}`;
+      newChatIds.push(chatKey);
+
+      let existingChat = chats.value.find(
+        (ch) => ch.id === c.otherUserId && ch.type === "private"
+      );
+
+      if (!existingChat) {
+        // New chat - add it
+        existingChat = {
+          id: c.otherUserId,
+          maNhomSolo: c.maNhomSolo,
+          name: c.otherUserName || c.otherUserId,
+          avatar: c.avatar,
+          lastMessage: c.lastMessage || "",
+          time: c.ngayGui || "",
+          gender: c.gender,
+          type: "private",
+        };
+        chats.value.push(existingChat);
+      } else {
+        // Update existing chat with new data
+        const oldTime = new Date(existingChat.time || 0).getTime();
+        const newTime = new Date(c.ngayGui || 0).getTime();
+
+        existingChat.name = c.otherUserName || c.otherUserId;
+        existingChat.avatar = c.avatar;
+
+        // Only update if new message is fresher
+        if (newTime > oldTime) {
+          existingChat.lastMessage = c.lastMessage || "";
+          existingChat.time = c.ngayGui || "";
+        }
+      }
+    }
+
+    // Check group chats
+    for (const g of groupRes.data || []) {
+      const chatKey = `group-${g.maNhom}`;
+      newChatIds.push(chatKey);
+
+      let existingChat = chats.value.find(
+        (ch) => ch.id === g.maNhom && ch.type === "group"
+      );
+
+      if (!existingChat) {
+        // New group - add it
+        existingChat = {
+          id: g.maNhom,
+          maNhom: g.maNhom,
+          name: g.tenNhom,
+          avatar: null,
+          lastMessage: g.lastMessage || "",
+          time: g.ngayGui || "",
+          type: "group",
+        };
+        chats.value.push(existingChat);
+      } else {
+        // Update existing group
+        const oldTime = new Date(existingChat.time || 0).getTime();
+        const newTime = new Date(g.ngayGui || 0).getTime();
+
+        existingChat.name = g.tenNhom;
+
+        // Only update if new message is fresher
+        if (newTime > oldTime) {
+          existingChat.lastMessage = g.lastMessage || "";
+          existingChat.time = g.ngayGui || "";
+        }
+      }
+    }
+
+    // Remove chats that no longer exist
+    chats.value = chats.value.filter((c) =>
+      newChatIds.includes(`${c.type}-${c.id}`)
+    );
+
+    // Sort by time (newest first)
+    chats.value.sort((a, b) => {
+      const timeA = new Date(a.time || 0).getTime();
+      const timeB = new Date(b.time || 0).getTime();
+      return timeB - timeA;
+    });
+
+    lastFetchTime.value = new Date();
+    console.log("✅ Chat list refreshed", new Date().toLocaleTimeString());
+  } catch (error) {
+    console.warn("Error refreshing chat list:", error);
+  }
+};
+
 onBeforeUnmount(() => {
   try {
     if (panelListener) window.removeEventListener("open-panel", panelListener);
@@ -1769,12 +1927,25 @@ onMounted(async () => {
       }
     },
   });
-});
 
-onBeforeUnmount(() => {
-  try {
-    if (panelListener) window.removeEventListener("open-panel", panelListener);
-  } catch (e) {}
+  // ✅ Polling chat list mỗi 3 giây để cập nhật tin nhắn mới
+  const chatListRefreshInterval = setInterval(() => {
+    try {
+      refreshChatList().catch((e) => {
+        console.warn("Failed to refresh chat list:", e);
+      });
+    } catch (e) {
+      console.error("Chat list refresh error:", e);
+    }
+  }, 3000);
+
+  onBeforeUnmount(() => {
+    try {
+      if (panelListener)
+        window.removeEventListener("open-panel", panelListener);
+      clearInterval(chatListRefreshInterval); // ✅ Cleanup interval
+    } catch (e) {}
+  });
 });
 </script>
 

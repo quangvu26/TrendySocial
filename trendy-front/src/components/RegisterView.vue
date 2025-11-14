@@ -141,77 +141,99 @@
 
         <div v-if="currentStep === 2" class="space-y-4">
           <h3 class="text-xl font-medium mb-6">Ngày sinh</h3>
-          <form @submit.prevent="nextStep" class="space-y-4">
-            <input
-              v-model="form.ngaySinh"
-              type="date"
-              class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5630]"
-              required
-            />
-
-            <div class="flex space-x-4">
-              <button
-                type="button"
-                @click="prevStep"
-                class="flex-1 border border-[#FF5630] text-[#FF5630] py-2 rounded-md hover:bg-gray-50 transition"
-              >
-                Quay lại
-              </button>
-              <button
-                type="submit"
-                class="flex-1 bg-[#FF5630] text-white py-2 rounded-md hover:bg-[#ff6647] transition"
-              >
-                Tiếp
-              </button>
+          <div class="flex flex-col md:flex-row gap-6 items-center">
+            <div class="flex-1">
+              <img
+                src="/images/FormLogin/Blowing out Birthday candles-pana.svg"
+                alt="Birthday"
+                class="w-full h-auto"
+              />
             </div>
-          </form>
+            <form @submit.prevent="nextStep" class="flex-1 space-y-4 w-full">
+              <input
+                v-model="form.ngaySinh"
+                type="date"
+                class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5630]"
+                required
+              />
+
+              <div class="flex space-x-4">
+                <button
+                  type="button"
+                  @click="prevStep"
+                  class="flex-1 border border-[#FF5630] text-[#FF5630] py-2 rounded-md hover:bg-gray-50 transition"
+                >
+                  Quay lại
+                </button>
+                <button
+                  type="submit"
+                  class="flex-1 bg-[#FF5630] text-white py-2 rounded-md hover:bg-[#ff6647] transition"
+                >
+                  Tiếp
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <div v-if="currentStep === 3" class="space-y-4">
           <h3 class="text-xl font-medium mb-6">Xác nhận Email</h3>
-          <p class="text-sm text-gray-600 mb-4">
-            Mã xác nhận đã gửi tới <strong>{{ form.email }}</strong>
-          </p>
-
-          <form @submit.prevent="handleVerifyCode" class="space-y-4">
-            <input
-              v-model="verificationCode"
-              type="text"
-              placeholder="Mã xác nhận"
-              class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5630]"
-              required
-            />
-
-            <div class="flex justify-between text-sm">
-              <button
-                type="button"
-                @click="resendCode"
-                :disabled="resendTimer > 0"
-                class="text-[#FF5630] hover:text-[#ff6647] disabled:opacity-50 transition"
-              >
-                {{
-                  resendTimer > 0 ? `Gửi lại sau ${resendTimer}s` : "Gửi lại mã"
-                }}
-              </button>
+          <div class="flex flex-col md:flex-row gap-6 items-center">
+            <div class="flex-1">
+              <img
+                src="/images/FormLogin/Mail sent-bro.svg"
+                alt="Email Verification"
+                class="w-full h-auto"
+              />
             </div>
+            <div class="flex-1">
+              <p class="text-sm text-gray-600 mb-4">
+                Mã xác nhận đã gửi tới <strong>{{ form.email }}</strong>
+              </p>
 
-            <div class="flex space-x-4">
-              <button
-                type="button"
-                @click="prevStep"
-                class="flex-1 border border-[#FF5630] text-[#FF5630] py-2 rounded-md hover:bg-gray-50 transition"
-              >
-                Quay lại
-              </button>
-              <button
-                type="submit"
-                :disabled="isLoading"
-                class="flex-1 bg-[#FF5630] text-white py-2 rounded-md hover:bg-[#ff6647] disabled:opacity-50 transition"
-              >
-                {{ isLoading ? "Xác nhận..." : "Xác nhận" }}
-              </button>
+              <form @submit.prevent="handleVerifyCode" class="space-y-4">
+                <input
+                  v-model="verificationCode"
+                  type="text"
+                  placeholder="Mã xác nhận"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5630]"
+                  required
+                />
+
+                <div class="flex justify-between text-sm">
+                  <button
+                    type="button"
+                    @click="resendCode"
+                    :disabled="resendTimer > 0"
+                    class="text-[#FF5630] hover:text-[#ff6647] disabled:opacity-50 transition"
+                  >
+                    {{
+                      resendTimer > 0
+                        ? `Gửi lại sau ${resendTimer}s`
+                        : "Gửi lại mã"
+                    }}
+                  </button>
+                </div>
+
+                <div class="flex space-x-4">
+                  <button
+                    type="button"
+                    @click="prevStep"
+                    class="flex-1 border border-[#FF5630] text-[#FF5630] py-2 rounded-md hover:bg-gray-50 transition"
+                  >
+                    Quay lại
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="isLoading"
+                    class="flex-1 bg-[#FF5630] text-white py-2 rounded-md hover:bg-[#ff6647] disabled:opacity-50 transition"
+                  >
+                    {{ isLoading ? "Xác nhận..." : "Xác nhận" }}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
 
         <p class="text-center text-sm text-gray-600 mt-4">
@@ -346,9 +368,11 @@ const nextStep = async () => {
 
   if (currentStep.value === 1) {
     if (!(await checkUniquenessStep1())) return;
+    // Register và send code
+    await handleRegisterAndSendCode();
+  } else {
+    currentStep.value++;
   }
-
-  currentStep.value++;
 };
 
 const prevStep = () => {
@@ -365,6 +389,7 @@ const handleRegisterAndSendCode = async () => {
     const regRes = await register(form.value);
     await sendVerificationCode(form.value.email);
     startResendTimer();
+    isLoading.value = false;
     currentStep.value++;
   } catch (err) {
     console.error("❌ Register error:", err);

@@ -14,13 +14,5 @@ public interface TinNhanCaNhanRepository extends JpaRepository<TinNhanCaNhan, St
     List<TinNhanCaNhan> findByMaNhomSoloOrderByNgayGuiAsc(String maNhomSolo);
     
     List<TinNhanCaNhan> findByMaNhomSoloAndGhimTrueOrderByNgayGuiDesc(String maNhomSolo);
-    
-    List<TinNhanCaNhan> findByMaNguoiGuiAndMaNguoiNhanOrderByNgayGuiAsc(String maNguoiGui, String maNguoiNhan);
-    
-    List<TinNhanCaNhan> findByMaNguoiNhanAndMaNguoiGuiOrderByNgayGuiAsc(String receiver, String sender);
-    
-    Page<TinNhanCaNhan> findByMaNguoiGuiAndMaNguoiNhanOrMaNguoiNhanAndMaNguoiGuiOrderByNgayGuiAsc(
-            String s1, String r1, String s2, String r2, Pageable pageable);
-
-    Optional<TinNhanCaNhan> findTopByMaNguoiGuiAndMaNguoiNhanOrderByNgayGuiDesc(String sender, String receiver);
+    Optional<TinNhanCaNhan> findTopByMaNhomSoloOrderByNgayGuiDesc(String maNhomSolo);
 }

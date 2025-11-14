@@ -57,7 +57,7 @@ public class ChatController {
         try {
             List<SoloChat> soloChats = soloChatRepository.findByUserId(userId);
             
-            // Convert to DTO with other user info
+            // Convert to DTO with other user info and latest message
             List<SoloChatDTO> dtos = soloChats.stream().map(sc -> {
                 String otherUserId = sc.getId_user_1().equals(userId) ? 
                     sc.getId_user_2() : sc.getId_user_1();
@@ -65,7 +65,22 @@ public class ChatController {
                 try {
                     User otherUser = userRepository.findById(otherUserId)
                         .orElse(null);
-                    return SoloChatDTO.fromEntity(sc, userId, otherUser);
+                    SoloChatDTO dto = SoloChatDTO.fromEntity(sc, userId, otherUser);
+                    
+                    // Get latest message
+                    try {
+                        var latestMsg = privateRepo
+                            .findTopByMaNhomSoloOrderByNgayGuiDesc(sc.getIdSoloChat());
+                        if (latestMsg.isPresent()) {
+                            dto.setLastMessage(latestMsg.get().getNoiDung());
+                            dto.setNgayGui(latestMsg.get().getNgayGui() != null ? 
+                                latestMsg.get().getNgayGui().toString() : "");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Failed to get last message for solo chat: " + e.getMessage());
+                    }
+                    
+                    return dto;
                 } catch (Exception e) {
                     return SoloChatDTO.fromEntity(sc, userId, null);
                 }
@@ -131,6 +146,8 @@ public class ChatController {
                             .findTopByMaNhomOrderByNgayGuiDesc(g.getMaNhom());
                         if (latestMsg.isPresent()) {
                             dto.setLastMessage(latestMsg.get().getNoiDung());
+                            dto.setNgayGui(latestMsg.get().getNgayGui() != null ? 
+                                latestMsg.get().getNgayGui().toString() : "");
                         }
                     } catch (Exception e) {
                         System.out.println("Failed to get last message: " + e.getMessage());

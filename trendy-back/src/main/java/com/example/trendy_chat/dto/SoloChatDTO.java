@@ -20,6 +20,7 @@ public class SoloChatDTO {
     private String avatar;
     private Boolean gender;
     private String lastMessage;
+    private String ngayGui;         // Time of last message
 
     public static SoloChatDTO fromEntity(SoloChat sc, String currentUserId, User otherUser) {
         String otherUserId = sc.getId_user_1().equals(currentUserId) ? 

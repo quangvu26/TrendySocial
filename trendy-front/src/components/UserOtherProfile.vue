@@ -872,10 +872,15 @@ const loadUserProfile = async () => {
 
     // Load posts - ONLY public posts
     try {
-      const postsRes = await api.get(`/trendy/posts?userId=${props.userId}`);
+      const currentUser = storage.getUser();
+      const currentUserId = currentUser?.id || currentUser?.email;
+
+      const postsRes = await api.get(
+        `/trendy/posts?userId=${props.userId}&viewerId=${currentUserId}`
+      );
       const postsData = Array.isArray(postsRes.data) ? postsRes.data : [];
 
-      // Filter public posts only
+      // Backend already filters by privacy, but keep local filter as safety
       const publicPosts = postsData.filter(
         (p) => p.cheDoRiengTu === "CONG_KHAI" || p.cheDoRiengTu === "public"
       );

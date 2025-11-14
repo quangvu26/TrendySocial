@@ -10,6 +10,7 @@ public class GroupChatDTO {
     private String nguoiTao;
     private String anhNhom;  // Match database column name
     private String lastMessage;
+    private String ngayGui;  // Time of last message
 
     public static GroupChatDTO fromEntity(GroupChat g) {
         GroupChatDTO dto = new GroupChatDTO();

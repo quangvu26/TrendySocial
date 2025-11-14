@@ -723,63 +723,6 @@
                 <option value="RIENG_TU">🔒 Một mình</option>
               </select>
             </div>
-
-            <div class="border-t pt-4">
-              <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 text-sm">
-                  <i class="bi bi-chat-left text-lg"></i>
-                  <span>Ẩn bình luận</span>
-                </label>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    v-model="editHideComments"
-                    type="checkbox"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                  ></div>
-                </label>
-              </div>
-            </div>
-
-            <div class="border-t pt-4">
-              <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 text-sm">
-                  <i class="bi bi-heart text-lg"></i>
-                  <span>Ẩn lượt thích</span>
-                </label>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    v-model="editHideLikes"
-                    type="checkbox"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                  ></div>
-                </label>
-              </div>
-            </div>
-
-            <div class="border-t pt-4">
-              <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 text-sm">
-                  <i class="bi bi-eye-fill text-lg"></i>
-                  <span>Ẩn lượt xem</span>
-                </label>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    v-model="editHideViews"
-                    type="checkbox"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                  ></div>
-                </label>
-              </div>
-            </div>
           </div>
 
           <div class="px-6 py-4 border-t flex justify-end gap-3 flex-shrink-0">
@@ -1017,7 +960,9 @@ const loadProfile = async () => {
       friendsCount.value = 0;
     }
 
-    const postsRes = await api.get(`/trendy/posts?userId=${user.value.id}`);
+    const postsRes = await api.get(
+      `/trendy/posts?userId=${user.value.id}&viewerId=${user.value.id}`
+    );
     const postsData = Array.isArray(postsRes.data) ? postsRes.data : [];
 
     // Debug
@@ -1634,6 +1579,10 @@ const saveEditPost = async () => {
     showEditPostModal.value = false;
     editingPost.value = null;
     editPostContent.value = "";
+
+    // Reload profile to reflect privacy changes in post list
+    await loadProfile();
+
     alert("Bài viết đã cập nhật!");
   } catch (error) {
     console.error("Failed to edit post:", error);

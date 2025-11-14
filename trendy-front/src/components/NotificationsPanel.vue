@@ -53,11 +53,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import api from "../api/api";
 
 const notifications = ref([]);
 const currentUserId = ref(null);
+let refreshInterval = null;
 
 // Load notifications từ API
 const loadNotifications = async () => {
@@ -180,11 +181,21 @@ onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   currentUserId.value = user.id;
 
+  // Load notifications once on mount
   loadNotifications();
 
-  // Refresh every 5 seconds for real-time updates
-  const interval = setInterval(loadNotifications, 5000);
-  onBeforeUnmount(() => clearInterval(interval));
+  // Setup auto-refresh every 5 seconds (more efficient than polling on every render)
+  refreshInterval = setInterval(() => {
+    loadNotifications();
+  }, 5000);
+});
+
+onBeforeUnmount(() => {
+  // Clear interval on unmount
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
 });
 </script>
 

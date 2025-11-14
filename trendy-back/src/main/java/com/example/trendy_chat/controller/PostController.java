@@ -100,34 +100,51 @@ public class PostController {
     @GetMapping
     public ResponseEntity<?> getPostsByUser(
             @RequestParam String userId,
+            @RequestParam(required = false) String viewerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
             List<Post> posts = postRepository.findByIdUserOrderByNgayDangDesc(userId);
-            System.out.println("✅ Loaded " + posts.size() + " posts for user: " + userId);
+            System.out.println("✅ Loaded " + posts.size() + " posts for user: " + userId + ", viewerId: " + viewerId);
             
             if (posts.isEmpty()) {
                 System.out.println("⚠️ No posts found for user: " + userId);
                 return ResponseEntity.ok(new ArrayList<>());
             }
             
-            // Map to DTO with like counts
+            // Filter posts based on privacy and viewer
+            boolean isSameUser = userId.equals(viewerId);
             List<Map<String, Object>> response = new ArrayList<>();
+            
             for (Post post : posts) {
+                String privacy = post.getCheDoRiengTu();
+                
+                // Privacy filter logic:
+                // - Owner can always see their own posts (RIENG_TU, BAN_BE, CONG_KHAI)
+                // - Others can only see CONG_KHAI (public)
+                if (!isSameUser && "RIENG_TU".equalsIgnoreCase(privacy)) {
+                    System.out.println("🔒 Skipping private post " + post.getIdPost());
+                    continue; // Skip private posts for non-owners
+                }
+                if (!isSameUser && "BAN_BE".equalsIgnoreCase(privacy)) {
+                    System.out.println("👥 Skipping friend-only post " + post.getIdPost());
+                    continue; // Skip friend-only posts (TODO: check friendship)
+                }
+                
                 Map<String, Object> dto = new HashMap<>();
                 dto.put("idPost", post.getIdPost());
                 dto.put("idUser", post.getIdUser());
                 dto.put("noiDung", post.getNoiDung());
                 dto.put("duongDanAnh", post.getDuongDanAnh());
                 
-                // Map privacy
-                String privacy = post.getCheDoRiengTu();
-                if ("public".equalsIgnoreCase(privacy)) privacy = "CONG_KHAI";
-                else if ("friends".equalsIgnoreCase(privacy)) privacy = "BAN_BE";
-                else if ("private".equalsIgnoreCase(privacy)) privacy = "RIENG_TU";
-                else privacy = "CONG_KHAI";
+                // Map privacy to frontend format
+                String privacyDisplay = privacy;
+                if ("public".equalsIgnoreCase(privacy)) privacyDisplay = "CONG_KHAI";
+                else if ("friends".equalsIgnoreCase(privacy)) privacyDisplay = "BAN_BE";
+                else if ("private".equalsIgnoreCase(privacy)) privacyDisplay = "RIENG_TU";
+                else privacyDisplay = "CONG_KHAI";
                 
-                dto.put("cheDoRiengTu", privacy);
+                dto.put("cheDoRiengTu", privacyDisplay);
                 dto.put("ngayDang", post.getNgayDang());
                 
                 // Count likes from DB
@@ -141,7 +158,7 @@ public class PostController {
                 response.add(dto);
             }
             
-            System.out.println("✅ Response size: " + response.size());
+            System.out.println("✅ Response size after filtering: " + response.size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();

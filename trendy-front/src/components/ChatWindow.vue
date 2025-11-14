@@ -693,6 +693,7 @@ const emits = defineEmits([
   "block-user",
   "back-to-list",
   "viewUserProfile",
+  "message-received", // Emit khi tin nhắn mới đến
 ]);
 
 // Initialize friend button state composable
@@ -1053,6 +1054,16 @@ const setupSubscription = async () => {
           "✅ Message added and rendered, total:",
           messages.value.length
         );
+
+        // ✅ EMIT event để cập nhật chat list
+        emits("message-received", {
+          chatId: props.chat?.id,
+          chatType: props.chat?.type,
+          lastMessage: newMessage.content,
+          time: newMessage.time,
+          sender: newMessage.sender,
+        });
+
         try {
           const key = `chat-history-${props.chat?.type || "unknown"}-${
             props.chat?.id

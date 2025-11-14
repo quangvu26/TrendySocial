@@ -128,12 +128,29 @@ const errors = ref({});
 const isLoading = ref(false);
 
 onMounted(() => {
-  const oauthUser = getOAuthUser();
-  if (oauthUser) {
-    email.value = oauthUser.email || "";
-    ten.value = oauthUser.name || "";
-    if (!id.value && oauthUser.email) {
-      id.value = oauthUser.email.split("@")[0];
+  // First try to get OAuth data from query parameters (from backend redirect)
+  const route = window.location;
+  const params = new URLSearchParams(route.search);
+
+  const emailParam = params.get("email");
+  const nameParam = params.get("name");
+  const pictureParam = params.get("picture");
+
+  if (emailParam) {
+    email.value = emailParam;
+    ten.value = nameParam || "";
+    if (!id.value && emailParam) {
+      id.value = emailParam.split("@")[0];
+    }
+  } else {
+    // Fallback to sessionStorage for OAuth user data
+    const oauthUser = getOAuthUser();
+    if (oauthUser) {
+      email.value = oauthUser.email || "";
+      ten.value = oauthUser.name || "";
+      if (!id.value && oauthUser.email) {
+        id.value = oauthUser.email.split("@")[0];
+      }
     }
   }
 });
