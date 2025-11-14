@@ -11,6 +11,8 @@
 [![languages](https://img.shields.io/badge/languages-6-orange.svg?style=flat)](https://github.com/quangvu26/TrendySocial)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
+
+---
 **Built with the tools and technologies:**
 
 [![JSON](https://img.shields.io/badge/JSON-000?logo=json&logoColor=fff&style=flat)](https://www.json.org)
