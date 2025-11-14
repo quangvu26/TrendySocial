@@ -1,4 +1,4 @@
-# 🌟 TrendySocial - Mạng xã hội hiện đại
+# 🌟 TrendySocial - Website mạng xã hội hiện đại
 
 <div align="center">
 
