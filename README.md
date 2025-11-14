@@ -4,12 +4,13 @@
 
 # TRENDYSOCIAL
 
-_Connect, Engage, Inspire — Redefining Social Experiences_
+**Nền tảng mạng xã hội toàn diện với chat real-time, theo dõi, và chia sẻ nội dung**
 
 [![last commit](https://img.shields.io/badge/last%20commit-today-brightgreen.svg?style=flat)](https://github.com/quangvu26/TrendySocial)
 [![vue](https://img.shields.io/badge/vue-54.6%25-green.svg?style=flat&logo=vue.js)](https://vuejs.org)
 [![languages](https://img.shields.io/badge/languages-6-orange.svg?style=flat)](https://github.com/quangvu26/TrendySocial)
-
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
 **Built with the tools and technologies:**
 
 [![JSON](https://img.shields.io/badge/JSON-000?logo=json&logoColor=fff&style=flat)](https://www.json.org)
@@ -25,13 +26,6 @@ _Connect, Engage, Inspire — Redefining Social Experiences_
 [![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff&style=flat)](https://vitejs.dev)
 [![Axios](https://img.shields.io/badge/Axios-5A2D81?logo=axios&logoColor=fff&style=flat)](https://axios-http.com)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?logo=bootstrap&logoColor=fff&style=flat)](https://getbootstrap.com)
-
----
-
-**Nền tảng mạng xã hội toàn diện với chat real-time, theo dõi, và chia sẻ nội dung**
-
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
 
 </div>
 
