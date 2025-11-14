@@ -1,7 +1,3 @@
-/**
- * VERIFY FIX - Check if storage is correct after login
- */
-
 window.verifyLoginFix = async function () {
   console.log("=== VERIFY LOGIN FIX ===\n");
 

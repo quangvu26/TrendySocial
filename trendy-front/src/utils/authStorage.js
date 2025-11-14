@@ -1,8 +1,3 @@
-/**
- * Unified Authentication Storage Management
- * Centralized token & OAuth data storage
- */
-
 const TOKEN_KEY = "authToken";
 const OAUTH_USER_KEY = "oauthUser";
 
@@ -14,7 +9,7 @@ export function saveToken(token) {
   // FIXED: Use exact key format
   const key = `trendy_${port}_token`;
   localStorage.setItem(key, token);
-  console.log(`✅ Token saved to: "${key}"`);
+
   return token;
 }
 
@@ -24,16 +19,13 @@ export function getToken() {
   const key = `trendy_${port}_token`;
   const token = localStorage.getItem(key);
   if (token) {
-    console.log(`✅ Token found from: "${key}"`);
   } else {
-    console.log(`❌ Token NOT found from: "${key}"`);
   }
   return token;
 }
 
 export const clearToken = () => {
   localStorage.removeItem(TOKEN_KEY);
-  console.log("🗑️  Token cleared");
 };
 
 export const hasToken = () => {
@@ -46,7 +38,6 @@ export const hasToken = () => {
 export const saveOAuthUser = (userData) => {
   if (!userData) return;
   sessionStorage.setItem(OAUTH_USER_KEY, JSON.stringify(userData));
-  console.log("✅ OAuth user saved");
 };
 
 export const getOAuthUser = () => {
@@ -61,7 +52,6 @@ export const getOAuthUser = () => {
 
 export const clearOAuthUser = () => {
   sessionStorage.removeItem(OAUTH_USER_KEY);
-  console.log("🗑️  OAuth user cleared");
 };
 
 /**
@@ -70,7 +60,6 @@ export const clearOAuthUser = () => {
 export const clearAllAuth = () => {
   clearToken();
   clearOAuthUser();
-  console.log("🗑️  All auth data cleared");
 };
 
 /**
@@ -86,7 +75,6 @@ export function setUser(user) {
   // FIXED: Use exact key format
   const key = `trendy_${port}_user`;
   localStorage.setItem(key, JSON.stringify(user));
-  console.log(`✅ User saved to: "${key}"`);
 }
 
 export function getUser() {

@@ -11,10 +11,6 @@ import router from "./router";
 import { clearAllAuth } from "./utils/authStorage";
 import { testFriendStatus } from "./composables/useFriendStatusDebug";
 
-// IMPORTANT: Clear any stale/invalid auth data on app start
-console.log("🚀 Starting Trendy Social App...");
-
-// Clear potentially invalid auth data on startup
 clearAllAuth();
 
 // Attach debug helper to window

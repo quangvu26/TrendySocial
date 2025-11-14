@@ -46,26 +46,20 @@ export const useHeaderButtonState = () => {
     }
 
     try {
-      console.log("📥 Loading friend state for:", chatUserId);
-
       const response = await api.get("/trendy/friends/status", {
         params: { userId1: userId, userId2: chatUserId },
       });
 
       const status = response.data?.status || "none";
-      console.log("📥 Friend status from backend:", status);
 
       // Update state based on status
       if (status === "accepted") {
-        console.log("✅ Status: FRIEND - show nothing, hủy kết bạn ở menu");
         isFriend.value = true;
         hasSentRequest.value = false;
       } else if (status === "pending_from_me") {
-        console.log("⏳ Status: PENDING - show 'Đã gửi lời mời'");
         isFriend.value = false;
         hasSentRequest.value = true;
       } else {
-        console.log("❌ Status: NONE - show 'Kết bạn'");
         isFriend.value = false;
         hasSentRequest.value = false;
       }
@@ -95,7 +89,7 @@ export const useHeaderButtonState = () => {
     try {
       if (hasSentRequest.value) {
         // Cancel request
-        console.log("❌ Canceling friend request...");
+
         return {
           success: false,
           action: "cancel",
@@ -103,7 +97,7 @@ export const useHeaderButtonState = () => {
       }
 
       // Send friend request
-      console.log("📤 Sending friend request...");
+
       return await sendFriendRequestHandler(userId, chatUserId);
     } finally {
       isLoading.value = false;
@@ -122,7 +116,6 @@ export const useHeaderButtonState = () => {
       const cacheKey = `friend-status-${userId}-${chatUserId}`;
       sessionStorage.setItem(cacheKey, "pending_from_me");
 
-      console.log("✅ Friend request sent successfully");
       return {
         success: true,
         action: "send",

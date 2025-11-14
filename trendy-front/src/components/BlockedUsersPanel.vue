@@ -1,48 +1,60 @@
 <template>
-  <div class="p-4">
-    <h4 class="font-medium mb-4">Người dùng đã chặn</h4>
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+    @click.self="$emit('close')"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div class="p-4 border-b flex items-center justify-between">
+        <h3 class="font-semibold text-lg">Người dùng đã chặn</h3>
+        <button
+          @click="$emit('close')"
+          class="text-gray-500 hover:text-gray-900"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="flex items-center justify-center py-8">
-      <i class="bi bi-arrow-repeat animate-spin mr-2"></i>
-      Đang tải...
-    </div>
-
-    <!-- Empty state -->
-    <div
-      v-else-if="blockedUsers.length === 0"
-      class="text-center py-8 text-gray-500"
-    >
-      <i class="bi bi-shield-slash text-4xl mb-2"></i>
-      <p>Bạn chưa chặn ai</p>
-    </div>
-
-    <!-- Blocked users list -->
-    <div v-else class="space-y-3">
-      <div
-        v-for="user in blockedUsers"
-        :key="user.id"
-        class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-      >
-        <div class="flex items-center space-x-3">
-          <img
-            :src="user.avatar || '/images/Avatar/male_avatar.png'"
-            class="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <div class="font-medium">{{ user.name || user.id }}</div>
-            <div class="text-xs text-gray-500">
-              Đã chặn {{ formatDate(user.blockedAt) }}
-            </div>
-          </div>
+      <div class="p-4">
+        <div v-if="loading" class="flex items-center justify-center py-8">
+          <i class="bi bi-arrow-repeat animate-spin mr-2"></i>
+          Đang tải...
         </div>
 
-        <button
-          @click="$emit('unblock', user.id)"
-          class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+        <div
+          v-else-if="blockedUsers.length === 0"
+          class="text-center py-8 text-gray-500"
         >
-          Bỏ chặn
-        </button>
+          <i class="bi bi-shield-slash text-4xl mb-2"></i>
+          <p>Bạn chưa chặn ai</p>
+        </div>
+
+        <div v-else class="space-y-3">
+          <div
+            v-for="user in blockedUsers"
+            :key="user.id"
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div class="flex items-center space-x-3">
+              <img
+                :src="user.avatar || '/images/Avatar/male_avatar.png'"
+                class="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <div class="font-medium">{{ user.name || user.id }}</div>
+                <div class="text-xs text-gray-500">
+                  Đã chặn {{ formatDate(user.blockedAt) }}
+                </div>
+              </div>
+            </div>
+
+            <button
+              @click="$emit('unblock', user.id)"
+              class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Bỏ chặn
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

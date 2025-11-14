@@ -1,6 +1,5 @@
 <template>
   <div class="w-full h-screen bg-gray-50 overflow-hidden flex flex-col">
-    <!-- Header -->
     <div
       class="bg-white border-b px-2 py-0 flex items-center justify-between flex-shrink-0"
     >
@@ -11,9 +10,7 @@
       <div class="w-10"></div>
     </div>
 
-    <!-- Scrollable Content - Header + Posts -->
     <div class="flex-1 overflow-y-auto">
-      <!-- Profile Header - Scrollable with posts -->
       <div class="bg-white border-b">
         <div class="px-6 py-6 flex flex-col items-center">
           <img
@@ -38,15 +35,10 @@
           </p>
           <div class="flex gap-2 mb-6">
             <button
-              @click="openEditProfile"
+              @click="showEditProfile = true"
               class="px-6 py-2 bg-gray-200 text-black rounded-lg font-medium hover:bg-gray-300 text-sm"
             >
               Chỉnh sửa
-            </button>
-            <button
-              class="px-6 py-2 bg-gray-200 text-black rounded-lg font-medium hover:bg-gray-300 text-sm"
-            >
-              Chia sẻ
             </button>
           </div>
           <div class="flex gap-12 mb-6">
@@ -87,7 +79,6 @@
           </div>
         </div>
 
-        <!-- Posts Content -->
         <div class="px-4 py-4">
           <div v-if="isLoading" class="text-center py-12">
             <i
@@ -98,7 +89,7 @@
             <i class="bi bi-inbox text-4xl text-gray-300 block mb-3"></i>
             <p class="text-gray-500 text-sm">Không có bài đăng nào</p>
           </div>
-          <!-- Grid Layout - Smart responsive -->
+
           <div
             v-else
             class="grid w-full gap-1"
@@ -110,7 +101,6 @@
               class="relative group cursor-pointer overflow-hidden bg-gray-200"
               @click="openPostDetail(post)"
             >
-              <!-- Image -->
               <img
                 v-if="post.images && post.images.length > 0"
                 :src="getImageUrl(post.images[0])"
@@ -134,7 +124,6 @@
                 <i class="bi bi-image text-gray-400 text-3xl"></i>
               </div>
 
-              <!-- Overlay - Instagram Style Stats -->
               <div
                 class="post-overlay absolute inset-0 bg-black transition-all duration-300 flex items-center justify-center gap-6"
               >
@@ -169,7 +158,6 @@
       </div>
     </div>
 
-    <!-- Modals -->
     <div
       v-if="showPostDetailModal && selectedPost"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -178,7 +166,6 @@
       <div
         class="bg-white rounded-lg w-full max-w-4xl h-[600px] overflow-hidden flex"
       >
-        <!-- Left: Image Full Size -->
         <div class="flex-1 bg-black flex items-center justify-center relative">
           <img
             v-if="selectedPost.images && selectedPost.images.length > 0"
@@ -188,9 +175,7 @@
           />
         </div>
 
-        <!-- Right: Comments & Info (Narrow) -->
         <div class="w-96 flex flex-col bg-white h-full border-l">
-          <!-- Post Header -->
           <div class="p-3 border-b flex-shrink-0">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-start gap-2 flex-1">
@@ -221,7 +206,7 @@
                 >
                   <i class="bi bi-three-dots text-lg"></i>
                 </button>
-                <!-- Post Menu -->
+
                 <div
                   v-if="selectedPost.showMenu"
                   class="absolute right-0 top-full mt-0.5 w-48 bg-white border rounded-lg shadow-lg z-50"
@@ -244,7 +229,6 @@
             </div>
           </div>
 
-          <!-- Post Content -->
           <div class="px-3 py-2 border-b flex-shrink-0">
             <p class="text-sm text-gray-800 line-clamp-2">
               {{ selectedPost.content }}
@@ -254,7 +238,6 @@
             </p>
           </div>
 
-          <!-- Comments List - Scrollable -->
           <div class="flex-1 overflow-y-auto p-2 space-y-2 min-h-0">
             <div
               v-if="
@@ -381,7 +364,6 @@
                     </button>
                   </div>
 
-                  <!-- FLAT Replies Layout -->
                   <div
                     v-if="comment.showReplies && comment.replies"
                     class="mt-3 space-y-2 ml-2 border-l-2 border-blue-300 pl-3"
@@ -492,7 +474,6 @@
                           </button>
                         </div>
 
-                        <!-- Nested Replies - also flat -->
                         <div
                           v-if="
                             reply.showReplies &&
@@ -526,7 +507,7 @@
                                 >
                                   {{ nestedReply.authorName }}
                                 </p>
-                                <!-- Nested Reply Menu Button -->
+
                                 <div class="relative">
                                   <button
                                     class="p-0.5 text-gray-500 hover:text-gray-700 transition-opacity opacity-0 group-hover:opacity-100"
@@ -621,9 +602,7 @@
             </div>
           </div>
 
-          <!-- Footer: Actions + Comment Input -->
           <div class="border-t p-3 space-y-2 flex-shrink-0">
-            <!-- Action Buttons -->
             <div class="flex items-center gap-3 justify-between">
               <div class="flex items-center gap-3">
                 <button
@@ -665,12 +644,10 @@
               </button>
             </div>
 
-            <!-- Like Count -->
             <div class="text-xs font-medium">
               {{ selectedPost.likes }} lượt thích
             </div>
 
-            <!-- Reply Context - compact -->
             <div
               v-if="selectedPost.replyingToComment"
               class="bg-blue-50 border border-blue-200 rounded p-1 text-xs max-h-10"
@@ -688,7 +665,6 @@
               </div>
             </div>
 
-            <!-- Comment Input -->
             <div class="flex gap-2 border-t pt-3">
               <input
                 v-model="newComment"
@@ -707,7 +683,7 @@
           </div>
         </div>
       </div>
-      <!-- Edit Post Modal -->
+
       <div
         v-if="showEditPostModal && editingPost"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -721,7 +697,6 @@
           </h2>
 
           <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            <!-- Content -->
             <div>
               <label class="block text-sm font-medium mb-2">Nội dung</label>
               <textarea
@@ -734,7 +709,6 @@
               <p class="text-xs text-gray-500 mt-1">💡 Ctrl+Enter để lưu</p>
             </div>
 
-            <!-- Privacy Setting -->
             <div class="border-t pt-4">
               <label class="flex items-center gap-2 text-sm mb-3">
                 <i class="bi bi-eye text-lg"></i>
@@ -750,7 +724,6 @@
               </select>
             </div>
 
-            <!-- Hide Comments -->
             <div class="border-t pt-4">
               <div class="flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm">
@@ -770,7 +743,6 @@
               </div>
             </div>
 
-            <!-- Hide Likes -->
             <div class="border-t pt-4">
               <div class="flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm">
@@ -790,7 +762,6 @@
               </div>
             </div>
 
-            <!-- Hide Views -->
             <div class="border-t pt-4">
               <div class="flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm">
@@ -811,7 +782,6 @@
             </div>
           </div>
 
-          <!-- Footer -->
           <div class="px-6 py-4 border-t flex justify-end gap-3 flex-shrink-0">
             <button
               @click="cancelEditPost"
@@ -829,16 +799,61 @@
         </div>
       </div>
 
-      <!-- Edit User Profile Modal -->
       <div
         v-if="showEditModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4"
         @click.self="showEditModal = false"
       >
         <div class="bg-white rounded-lg w-full max-w-sm p-6">
-          <h2 class="text-lg font-bold mb-4 text-center">
-            Chỉnh sửa trang cá nhân
-          </h2>
+          <h2 class="text-lg font-bold mb-4 text-center">Cài đặt tài khoản</h2>
+          <div class="space-y-3">
+            <button
+              @click="
+                showEditProfile = true;
+                showEditModal = false;
+              "
+              class="w-full flex items-center gap-3 px-4 py-3 border rounded-lg hover:bg-gray-50 transition text-left"
+            >
+              <i class="bi bi-person text-xl text-gray-600"></i>
+              <div>
+                <p class="font-medium text-sm">Thông tin cá nhân</p>
+                <p class="text-xs text-gray-500">
+                  Chỉnh sửa tên, avatar, bio...
+                </p>
+              </div>
+            </button>
+
+            <button
+              @click="
+                editBioMode = true;
+                showEditModal = false;
+              "
+              class="w-full flex items-center gap-3 px-4 py-3 border rounded-lg hover:bg-gray-50 transition text-left"
+            >
+              <i class="bi bi-file-text text-xl text-gray-600"></i>
+              <div>
+                <p class="font-medium text-sm">Tiểu sử</p>
+                <p class="text-xs text-gray-500">{{ userBio || "Chưa có" }}</p>
+              </div>
+            </button>
+
+            <button
+              @click="showEditModal = false"
+              class="w-full px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm font-medium mt-4"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="editBioMode && showEditModal === false"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4"
+        @click.self="editBioMode = false"
+      >
+        <div class="bg-white rounded-lg w-full max-w-sm p-6">
+          <h2 class="text-lg font-bold mb-4 text-center">Chỉnh sửa tiểu sử</h2>
           <textarea
             v-model="userBio"
             rows="4"
@@ -847,13 +862,13 @@
           ></textarea>
           <div class="flex gap-3">
             <button
-              @click="showEditModal = false"
+              @click="editBioMode = false"
               class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
             >
               Hủy
             </button>
             <button
-              @click="saveProfile"
+              @click="saveBio"
               class="flex-1 px-4 py-2 bg-[#FF5630] text-white rounded-lg hover:bg-[#FF4520] text-sm"
             >
               Lưu
@@ -861,33 +876,45 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Avatar Modal -->
-      <div
-        v-if="showAvatarModal"
-        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-        @click.self="showAvatarModal = false"
-      >
-        <div class="relative max-w-2xl max-h-[80vh]">
-          <img
-            :src="userAvatar"
-            class="w-full h-full object-contain rounded-lg"
-          />
-          <button
-            @click="showAvatarModal = false"
-            class="absolute top-2 right-2 p-2 bg-white rounded-full hover:bg-gray-200"
-          >
-            <i class="bi bi-x-lg text-2xl"></i>
-          </button>
-        </div>
+    <div
+      v-if="showAvatarModal"
+      class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-4"
+      @click.self="showAvatarModal = false"
+    >
+      <div class="relative">
+        <img
+          :src="userAvatar"
+          class="w-96 h-96 object-cover rounded-lg shadow-2xl"
+          @error="
+            (e) => {
+              e.target.src = '/images/Avatar/male_avatar.png';
+              console.error('Avatar load failed');
+            }
+          "
+        />
+        <button
+          @click="showAvatarModal = false"
+          class="absolute top-3 right-3 p-2 bg-white rounded-full hover:bg-gray-200 shadow-lg z-10"
+        >
+          <i class="bi bi-x-lg text-2xl"></i>
+        </button>
       </div>
     </div>
+
+    <EditProfile
+      v-if="showEditProfile"
+      @close="showEditProfile = false"
+      @updated="loadProfile"
+    />
   </div>
 </template>
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import api from "../api/api";
 import { storage } from "../utils/storage";
+import EditProfile from "./EditProfile.vue";
 
 // Define emits for component events
 const emit = defineEmits(["close", "viewUserProfile"]);
@@ -906,6 +933,7 @@ const showEditPostModal = ref(false);
 const showAvatarModal = ref(false);
 const showPostOptionsModal = ref(false);
 const showPostDetailModal = ref(false);
+const showEditProfile = ref(false);
 const selectedPost = ref(null);
 const newComment = ref("");
 const editingPost = ref(null);
@@ -914,6 +942,7 @@ const editPostPrivacy = ref("CONG_KHAI");
 const editHideComments = ref(false);
 const editHideLikes = ref(false);
 const editHideViews = ref(false);
+const editBioMode = ref(false);
 
 const tabs = [
   { id: "posts", label: "Bài đăng" },
@@ -961,14 +990,21 @@ const loadProfile = async () => {
     const storedUser = storage.getUser();
     if (storedUser) {
       user.value = storedUser;
-      userBio.value = storedUser.bio || "";
       userAvatar.value = storedUser.avatar || "/images/Avatar/male_avatar.png";
     }
 
     const userRes = await api
       .get(`/trendy/user/${user.value.id}`)
       .catch(() => null);
-    if (userRes?.data) user.value = { ...user.value, ...userRes.data };
+    if (userRes?.data) {
+      user.value = { ...user.value, ...userRes.data };
+      // Load tieuSu from database to sync
+      userBio.value = userRes.data.tieuSu || "";
+      // Update avatar from database
+      if (userRes.data.avatar) {
+        userAvatar.value = userRes.data.avatar;
+      }
+    }
 
     // Load friends count from API
     try {
@@ -976,7 +1012,6 @@ const loadProfile = async () => {
         `/trendy/friends/count/${user.value.id}`
       );
       friendsCount.value = friendsCountRes.data?.friendsCount || 0;
-      console.log("✅ Friends count:", friendsCount.value);
     } catch (e) {
       console.warn("Failed to load friends count:", e);
       friendsCount.value = 0;
@@ -985,8 +1020,7 @@ const loadProfile = async () => {
     const postsRes = await api.get(`/trendy/posts?userId=${user.value.id}`);
     const postsData = Array.isArray(postsRes.data) ? postsRes.data : [];
 
-    console.log("📸 Posts response:", postsRes);
-    console.log("📸 Posts data:", postsData); // Debug
+    // Debug
 
     if (!postsData || postsData.length === 0) {
       console.warn("⚠️ No posts data returned");
@@ -1017,7 +1051,7 @@ const loadProfile = async () => {
               : [post.duongDanAnh]
             : [];
 
-          console.log(`📸 Post ${post.idPost} images:`, images); // Debug
+          // Debug
           console.log(
             `📊 Post ${post.idPost} likes: ${post.likesCount}, comments: ${post.commentsCount}`
           ); // Debug
@@ -1046,22 +1080,32 @@ const loadProfile = async () => {
 
     posts.value = enrichedPosts.filter((p) => p !== null);
     postsCount.value = posts.value.length;
-    likesCount.value = posts.value.reduce(
-      (total, p) => total + (p.likes || 0),
-      0
-    );
 
-    console.log("✅ Loaded posts:", posts.value); // Debug
+    // Load total likes received from API
+    try {
+      const totalLikesRes = await api.get(
+        `/trendy/posts/user/${user.value.id}/total-likes`
+      );
+      likesCount.value = totalLikesRes.data?.totalLikes || 0;
+    } catch (e) {
+      console.warn("Failed to load total likes:", e);
+      // Fallback to local calculation
+      likesCount.value = posts.value.reduce(
+        (total, p) => total + (p.likes || 0),
+        0
+      );
+    }
+
+    // Debug
 
     // Load aspect ratios for all images
     posts.value.forEach((post) => {
       if (post.images && post.images.length > 0) {
         const imgUrl = getImageUrl(post.images[0]);
-        console.log(`🖼️ Loading image: ${imgUrl}`); // Debug
+        // Debug
         const img = new Image();
         img.onload = () => {
           const ratio = img.width / img.height;
-          console.log(`✅ Image loaded, ratio: ${ratio}`);
         };
         img.onerror = () => {
           console.error(`❌ Failed to load image: ${imgUrl}`);
@@ -1101,9 +1145,21 @@ const toggleLike = async (postId) => {
         post.likes += 1;
       }
     }
-    
-    // Recalculate total likes for header
-    likesCount.value = posts.value.reduce((total, p) => total + (p.likes || 0), 0);
+
+    // Recalculate total likes from API
+    try {
+      const totalLikesRes = await api.get(
+        `/trendy/posts/user/${user.value.id}/total-likes`
+      );
+      likesCount.value = totalLikesRes.data?.totalLikes || 0;
+    } catch (e) {
+      console.warn("Failed to reload total likes:", e);
+      // Fallback to local calculation
+      likesCount.value = posts.value.reduce(
+        (total, p) => total + (p.likes || 0),
+        0
+      );
+    }
 
     // Update selected post if it's open
     if (selectedPost.value && selectedPost.value.id === postId) {
@@ -1162,7 +1218,6 @@ const incrementPostView = async (postId) => {
     if (post) {
       post.views = (post.views || 0) + 1;
     }
-    console.log("✅ View counted for post:", postId);
   } catch (error) {
     console.error("Failed to count view:", error);
   }
@@ -1190,6 +1245,24 @@ const loadPostComments = async (postId) => {
               { headers: { Authorization: `Bearer ${token}` } }
             );
 
+            // Get correct likes count for comment
+            const likesCountRes = await api
+              .get(`/trendy/posts/${postId}/comment/${c.id}/likes`, {
+                headers: { Authorization: `Bearer ${token}` },
+                timeout: 5000,
+              })
+              .catch((err) => {
+                console.warn(
+                  `⚠️ Failed to get likes count for comment ${c.id}:`,
+                  err.message
+                );
+                return { data: { likesCount: c.likes || 0 } };
+              });
+            console.log(
+              `📌 Comment ${c.id} likes from API:`,
+              likesCountRes.data
+            );
+
             // Load replies for this comment
             const repliesRes = await api
               .get(`/trendy/posts/${postId}/comment/${c.id}/replies`, {
@@ -1212,12 +1285,27 @@ const loadPostComments = async (postId) => {
                     })
                     .catch(() => ({ data: { liked: false } }));
 
+                  const replyLikesCountRes = await api
+                    .get(`/trendy/posts/${postId}/comment/${reply.id}/likes`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                      timeout: 5000,
+                    })
+                    .catch((err) => {
+                      console.warn(
+                        `⚠️ Failed to get likes for reply ${reply.id}:`,
+                        err.message
+                      );
+                      return { data: { likesCount: reply.likes || 0 } };
+                    });
+
                   return {
                     ...reply,
                     authorName:
                       replyUserData.ten || replyUserData.name || reply.authorId,
                     authorAvatar:
                       replyUserData.avatar || "/images/Avatar/male_avatar.png",
+                    likes:
+                      replyLikesCountRes.data?.likesCount || reply.likes || 0,
                     liked: replyLikedRes.data?.liked || false,
                     replies: [],
                     showReplies: false,
@@ -1236,7 +1324,7 @@ const loadPostComments = async (postId) => {
               ...c,
               authorName: userData.ten || userData.name || c.authorId,
               authorAvatar: userData.avatar || "/images/Avatar/male_avatar.png",
-              likes: likesCount,
+              likes: likesCountRes.data?.likesCount || c.likes || 0,
               liked: likedRes.data?.liked || false,
               replies: enrichedReplies,
               showReplies: false,
@@ -1371,7 +1459,6 @@ const submitComment = async () => {
 
     newComment.value = "";
     selectedPost.value.replyingToComment = null;
-    console.log("✅ Comment posted successfully:", newReply);
   } catch (error) {
     console.error("Failed to submit comment:", error);
     alert(
@@ -1393,7 +1480,6 @@ const toggleCommentLike = async (comment) => {
       );
       comment.liked = false;
       comment.likes = Math.max(0, (comment.likes || 0) - 1);
-      console.log("✅ Comment unliked");
     } else {
       // Like - POST request
       await api.post(
@@ -1403,7 +1489,6 @@ const toggleCommentLike = async (comment) => {
       );
       comment.liked = true;
       comment.likes = (comment.likes || 0) + 1;
-      console.log("✅ Comment liked");
     }
 
     // Update local state only, don't reload entire comments list
@@ -1566,7 +1651,6 @@ const cancelEditPost = () => {
 };
 
 const blockCommentAuthor = (userId) => {
-  console.log("Blocking user:", userId);
   alert("Chặn người dùng: " + userId);
   // TODO: Call block user API
 };
@@ -1599,7 +1683,6 @@ const deleteComment = async (commentId) => {
     );
 
     alert("Bình luận đã xóa");
-    console.log("✅ Comment deleted:", commentId);
   } catch (error) {
     console.error("Failed to delete comment:", error);
     alert(
@@ -1640,7 +1723,6 @@ const hideComment = async (commentId) => {
     );
 
     alert("Bình luận đã ẩn");
-    console.log("✅ Comment hidden:", commentId);
   } catch (error) {
     console.error("Failed to hide comment:", error);
     alert("Không thể ẩn bình luận");
@@ -1655,7 +1737,7 @@ const replyToComment = (comment) => {
     authorName: comment.authorName,
     content: comment.content,
   };
-  console.log("Replying to:", comment.authorName);
+
   // Focus on input
   setTimeout(() => {
     document.querySelector('input[placeholder="Thêm bình luận..."]')?.focus();
@@ -1744,6 +1826,25 @@ const saveProfile = async () => {
     storage.setUser(user.value);
     showEditModal.value = false;
     alert("Đã cập nhật!");
+  } catch (error) {
+    alert("Không thể lưu");
+  }
+};
+
+const saveBio = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    await api.put(
+      `/trendy/user/${user.value.id}`,
+      { tieuSu: userBio.value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const user_data = storage.getUser();
+    user_data.tieuSu = userBio.value;
+    storage.setUser(user_data);
+    editBioMode.value = false;
+    showEditModal.value = false;
+    alert("Tiểu sử đã cập nhật!");
   } catch (error) {
     alert("Không thể lưu");
   }

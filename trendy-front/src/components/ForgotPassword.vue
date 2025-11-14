@@ -6,7 +6,6 @@
     <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
       <h3 class="text-center text-lg font-semibold mb-4">Quên mật khẩu</h3>
 
-      <!-- Step 1: Email & Code -->
       <div v-if="step === 1" class="space-y-4">
         <div>
           <label class="text-sm text-gray-600">Email</label>
@@ -53,7 +52,6 @@
         </button>
       </div>
 
-      <!-- Step 2: Reset Password -->
       <div v-if="step === 2" class="space-y-4">
         <div>
           <label class="text-sm text-gray-600">Mật khẩu mới</label>

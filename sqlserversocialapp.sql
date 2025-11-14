@@ -804,3 +804,6 @@ ALTER TABLE post
 ADD likes_count INT DEFAULT 0,
     comments_count INT DEFAULT 0,
     views_count INT DEFAULT 0;
+
+	ALTER TABLE tin_nhan_ca_nhan ADD COLUMN attachments NVARCHAR(MAX);
+ALTER TABLE chatting_group ADD COLUMN attachments NVARCHAR(MAX);

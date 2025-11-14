@@ -1,7 +1,6 @@
 <template>
   <div class="relative w-full h-screen bg-gray-50 overflow-hidden">
     <div class="flex h-full relative">
-      <!-- Integrated Sidebar -->
       <aside
         class="w-20 md:w-64 bg-white border-r h-full flex flex-col items-center md:items-stretch flex-shrink-0"
       >
@@ -35,7 +34,7 @@
             </li>
             <li>
               <button
-                @click="showCreatePostModal = true"
+                @click="onNavigate('posts')"
                 class="w-full flex items-center px-3 py-2 rounded hover:bg-gray-100 text-gray-600 hover:text-[#FF5630]"
               >
                 <i class="bi bi-plus-circle text-xl"></i>
@@ -97,7 +96,6 @@
       </aside>
 
       <div class="flex-1 flex relative">
-        <!-- Left: Chat list - Hidden when profile open -->
         <div
           v-if="!showProfileFullPage"
           :class="showChatOnMobile ? 'hidden sm:flex' : 'flex'"
@@ -121,7 +119,6 @@
           </div>
         </div>
 
-        <!-- Center: Chat window - Hidden when profile open -->
         <div
           v-if="!showProfileFullPage"
           :class="showChatOnMobile ? 'flex' : 'hidden sm:flex'"
@@ -153,7 +150,6 @@
             </template>
           </Suspense>
 
-          <!-- Connection state indicator -->
           <div
             v-if="chatConnectionState === 'connecting'"
             class="absolute top-0 left-0 right-0 bg-yellow-100 text-yellow-700 px-4 py-2 text-sm"
@@ -162,7 +158,6 @@
             Đang kết nối lại...
           </div>
 
-          <!-- Error toast -->
           <div
             v-if="chatError"
             class="absolute bottom-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg"
@@ -183,7 +178,6 @@
         </div>
       </div>
 
-      <!-- Side Panels Container - Friends Panel -->
       <div
         v-if="
           showFriendsPanel ||
@@ -216,15 +210,12 @@
         </div>
 
         <div class="flex-1 overflow-auto">
-          <!-- Blocked Users Panel -->
           <BlockedUsersPanel
             v-if="showBlockedPanel"
             @unblock="handleUnblockUser"
           />
 
-          <!-- Search Friends Panel -->
           <div v-if="showFriendSearch" class="p-4">
-            <!-- ...existing search UI... -->
             <div class="mb-4">
               <div class="relative">
                 <input
@@ -240,7 +231,6 @@
               </div>
             </div>
 
-            <!-- Search Results -->
             <div class="space-y-4">
               <div
                 v-if="searchQuery && searchResults.length === 0"
@@ -290,7 +280,6 @@
             </div>
           </div>
 
-          <!-- Friends Panel -->
           <div v-if="showFriendsPanel" class="p-4">
             <div class="flex items-center justify-between mb-4">
               <h4 class="font-medium">Danh sách bạn bè</h4>
@@ -307,7 +296,6 @@
               </button>
             </div>
 
-            <!-- Loading state -->
             <div
               v-if="isLoading"
               class="flex items-center justify-center py-8 text-gray-500"
@@ -316,7 +304,6 @@
               Đang tải danh sách bạn bè...
             </div>
 
-            <!-- Error state -->
             <div v-else-if="loadingError" class="text-center py-8">
               <div class="text-red-500 mb-2">
                 <i class="bi bi-exclamation-circle text-xl"></i>
@@ -330,7 +317,6 @@
               </button>
             </div>
 
-            <!-- Content -->
             <div v-else class="space-y-3">
               <div
                 v-for="friend in friends"
@@ -357,7 +343,6 @@
             </div>
           </div>
 
-          <!-- Posts Panel -->
           <div v-if="showPostsPanel" class="p-4">
             <textarea
               v-model="newPost"
@@ -383,12 +368,10 @@
             </div>
           </div>
 
-          <!-- Profile Panel -->
           <div v-if="showProfilePanel" class="p-4">PROFILE_PANEL_REMOVED</div>
         </div>
       </div>
 
-      <!-- Side Panels Container - Notifications Panel (RIÊNG BIỆT) -->
       <div
         v-if="showNotificationsPanel"
         class="absolute left-64 top-0 bottom-0 bg-white w-[28rem] shadow-lg flex flex-col overflow-hidden"
@@ -407,14 +390,12 @@
         </div>
 
         <div class="flex-1 overflow-auto">
-          <!-- Message Notifications + Friend Requests -->
           <div
             v-if="
               messageNotifications.length > 0 || incomingRequests.length > 0
             "
             class="p-4 space-y-6"
           >
-            <!-- Message Notifications -->
             <div v-if="messageNotifications.length > 0">
               <h4 class="font-medium mb-3">Tin nhắn mới</h4>
               <div class="space-y-3">
@@ -455,7 +436,6 @@
               </div>
             </div>
 
-            <!-- Friend Requests -->
             <div v-if="incomingRequests.length > 0">
               <h4 class="font-medium mb-3">Lời mời kết bạn</h4>
               <div class="space-y-3">
@@ -495,7 +475,6 @@
             </div>
           </div>
 
-          <!-- Empty state -->
           <div
             v-else
             class="flex items-center justify-center h-full text-center text-gray-500 p-4"
@@ -508,7 +487,6 @@
         </div>
       </div>
 
-      <!-- Close panel when clicking outside -->
       <div
         v-if="!showProfileFullPage"
         class="absolute inset-0 -z-10 bg-black bg-opacity-25"
@@ -516,7 +494,6 @@
       ></div>
     </div>
 
-    <!-- Profile Panel - Show as left overlay, stretched from sidebar -->
     <div
       v-if="showProfileFullPage"
       class="absolute top-0 left-20 md:left-64 bottom-0 bg-white shadow-lg overflow-hidden"
@@ -532,7 +509,6 @@
       />
     </div>
 
-    <!-- Other User Profile Panel -->
     <div
       v-if="showOtherUserProfile"
       class="absolute top-0 left-20 md:left-64 bottom-0 bg-white shadow-lg overflow-hidden"
@@ -550,7 +526,6 @@
     </div>
   </div>
 
-  <!-- Friend Requests Panel -->
   <Teleport to="body">
     <FriendRequestsPanel
       v-if="showRequests"
@@ -562,17 +537,24 @@
     />
   </Teleport>
 
-  <!-- Settings Modal -->
   <Teleport to="body">
     <SettingsModal
       v-if="showSettings"
       @close="closeSettings"
       @logout="logout"
       @navigate="navigateFromSettings"
+      @show-blocked-users="handleShowBlockedUsers"
     />
   </Teleport>
 
-  <!-- Create Post Modal -->
+  <Teleport to="body">
+    <BlockedUsersPanel
+      v-if="showBlockedPanel"
+      @close="showBlockedPanel = false"
+      @unblock="handleUnblockUser"
+    />
+  </Teleport>
+
   <Teleport to="body">
     <CreatePostModal
       v-if="showCreatePostModal"
@@ -606,7 +588,7 @@ const currentZIndex = ref(1000);
 
 const getNextZIndex = () => {
   currentZIndex.value += 1;
-  console.log(`📊 New z-index: ${currentZIndex.value}`);
+
   return currentZIndex.value;
 };
 
@@ -648,7 +630,6 @@ const showCreatePostModal = ref(false);
 
 // Search functionality
 const searchUsers = async () => {
-  console.log("Searching users with query:", searchQuery.value);
   if (!searchQuery.value || searchQuery.value.trim().length < 2) {
     searchResults.value = [];
     return;
@@ -677,8 +658,6 @@ const searchUsers = async () => {
       );
       searchResults.value = response.data || [];
     }
-
-    console.log("Search response:", searchResults.value);
 
     // Get blocked users list
     let blockedUserIds = [];
@@ -790,7 +769,6 @@ const getPanelTitle = () => {
 };
 
 const closeAllPanels = () => {
-  console.log("closeAllPanels called");
   showFriendsPanel.value = false;
   showPostsPanel.value = false;
   showNotificationsPanel.value = false;
@@ -802,8 +780,6 @@ const closeAllPanels = () => {
   // 🚫 DON'T reset showOtherUserProfile here - it's set by handleViewUserProfile
   activePanel.value = "chat"; // Reset to chat panel
 
-  console.log("All panels closed");
-
   // Reset search state
   searchQuery.value = "";
   searchResults.value = [];
@@ -811,13 +787,10 @@ const closeAllPanels = () => {
 
 const handleViewUserProfile = (userId) => {
   if (!userId) return;
-  console.log("🔗 🔗 🔗 HomeView received viewUserProfile event for:", userId);
 
   // SET STATE FIRST before closing panels
   otherUserId.value = userId;
   showOtherUserProfile.value = true;
-  console.log("✅ showOtherUserProfile set to true");
-  console.log("✅ otherUserId set to:", userId);
 
   // Tăng z-index khi mở trang người khác
   panelZIndex.value.otherUserProfile = getNextZIndex();
@@ -826,7 +799,6 @@ const handleViewUserProfile = (userId) => {
   closeAllPanels();
 };
 const handleStartChatFromProfile = (chatData) => {
-  console.log("Starting chat from profile:", chatData);
   selectedChat.value = chatData;
   showOtherUserProfile.value = false;
   showChatOnMobile.value = true;
@@ -866,16 +838,16 @@ const loadingError = ref(null);
 
 // Handle navigation from sidebar
 const onNavigate = async (panel) => {
-  console.log("onNavigate called with panel:", panel);
-
   loadingError.value = null;
+
+  // Close ALL panels first
+  closeAllPanels();
 
   try {
     // Tăng z-index khi navigate
     panelZIndex.value.sidePanel = getNextZIndex();
 
-    // Close all side panels
-    closeAllPanels(); // Set active panel
+    // Set active panel
     activePanel.value = panel;
 
     // Open corresponding panel
@@ -892,24 +864,21 @@ const onNavigate = async (panel) => {
         isLoading.value = false;
       }
     } else if (panel === "posts") {
-      showPostsPanel.value = true;
+      showCreatePostModal.value = true;
+      closeAllPanels(); // Đảm bảo tất cả panel khác đóng
     } else if (panel === "notifications") {
-      console.log("Loading notifications panel...");
       showNotificationsPanel.value = true;
 
       // Load notifications only if not cached
       if (!notificationsLoaded.value) {
         try {
-          console.log("📨 Loading from API (not cached)");
           await loadMessageNotifications();
           notificationsLoaded.value = true;
-          console.log("✅ Notifications cached");
         } catch (error) {
           console.error("Error loading notifications:", error);
           loadingError.value = "Không thể tải thông báo. Vui lòng thử lại sau.";
         }
       } else {
-        console.log("✅ Using cached notifications");
       }
     } else if (panel === "profile") {
       // Close chat and show profile
@@ -918,6 +887,8 @@ const onNavigate = async (panel) => {
       activePanel.value = "profile";
       panelZIndex.value.profileView = getNextZIndex();
       showProfileFullPage.value = true;
+    } else if (panel === "chat") {
+      // Just show chat list - panels already closed
     }
   } catch (error) {
     console.error("Error in panel navigation:", error);
@@ -942,7 +913,6 @@ const loadFriendsList = async () => {
     // Check STOMP connection first
     if (!socketService.isConnected()) {
       try {
-        console.log("Attempting to reconnect STOMP...");
         await socketService.connect();
       } catch (e) {
         console.error("STOMP connection failed:", e);
@@ -955,7 +925,16 @@ const loadFriendsList = async () => {
     });
 
     if (response.data) {
-      friends.value = response.data;
+      // Remove duplicates by userId
+      const seenIds = new Set();
+      const deduplicatedFriends = [];
+      for (const friend of response.data) {
+        if (!seenIds.has(friend.id)) {
+          seenIds.add(friend.id);
+          deduplicatedFriends.push(friend);
+        }
+      }
+      friends.value = deduplicatedFriends;
       if (friends.value.length === 0) {
         loadingError.value = "Bạn chưa có bạn bè nào";
       }
@@ -997,8 +976,6 @@ const loadIncomingRequests = async () => {
       return;
     }
 
-    console.log("📬 Loading incoming friend requests for:", userId);
-
     // Try endpoint: /trendy/friends/incoming
     const response = await api.get("/trendy/friends/incoming", {
       params: { userId },
@@ -1024,8 +1001,6 @@ const loadMessageNotifications = async () => {
       return;
     }
 
-    console.log("📨 Loading message notifications for:", userId);
-
     const response = await api.get("/trendy/notification/list", {
       params: { userId, limit: 15 },
     });
@@ -1043,7 +1018,6 @@ const loadMessageNotifications = async () => {
         params: { userId },
       });
       notificationsUnread.value = res.data?.count || 0;
-      console.log("📊 Unread count:", notificationsUnread.value);
     } catch (e) {
       console.warn("Failed to get unread count:", e);
     }
@@ -1094,7 +1068,6 @@ const handleNotificationClick = async (notification) => {
 // Delete notification
 const deleteNotification = async (notificationId) => {
   try {
-    console.log("🗑️  Deleting notification:", notificationId);
     await api.delete(`/trendy/notification/${notificationId}`);
 
     // Remove from list
@@ -1104,8 +1077,6 @@ const deleteNotification = async (notificationId) => {
 
     // Invalidate cache
     notificationsLoaded.value = false;
-
-    console.log("✅ Notification deleted");
   } catch (error) {
     console.error("Error deleting notification:", error);
     alert("Không thể xóa thông báo");
@@ -1115,9 +1086,7 @@ const deleteNotification = async (notificationId) => {
 // Refresh notifications (called when delete, mark read, etc)
 const refreshNotifications = async () => {
   try {
-    console.log("🔄 Refreshing notifications...");
     await loadMessageNotifications();
-    console.log("✅ Notifications refreshed");
   } catch (e) {
     console.error("Error refreshing:", e);
   }
@@ -1138,6 +1107,25 @@ const navigateFromSettings = (panel) => {
   } else {
     onNavigate(panel);
   }
+};
+
+const logout = async () => {
+  try {
+    // Disconnect STOMP connection
+    await socketService.disconnect();
+  } catch (e) {
+    console.warn("Failed to disconnect STOMP:", e);
+  }
+
+  // Clear storage
+  storage.clear();
+
+  // Redirect to login
+  router.push("/login");
+};
+
+const handleShowBlockedUsers = () => {
+  showBlockedPanel.value = true;
 };
 
 // Block user
@@ -1253,8 +1241,11 @@ const acceptRequest = async (maYeuCau, fromId) => {
     incomingRequests.value = incomingRequests.value.filter(
       (r) => r.maYeuCau !== maYeuCau
     );
-    // Add to friends list
-    friends.value.push({ id: fromId, name: fromId });
+    // Add to friends list (check for duplicates first)
+    const alreadyExists = friends.value.some((f) => f.id === fromId);
+    if (!alreadyExists) {
+      friends.value.push({ id: fromId, name: fromId });
+    }
     alert("Đã chấp nhận lời mời kết bạn");
   } catch (e) {
     console.error("Accept failed", e);
@@ -1297,8 +1288,6 @@ const sendFriendRequest = async (userId) => {
       return;
     }
 
-    console.log("Sending friend request from:", fromUserId, "to:", userId);
-
     await api.post(`/trendy/friends/request`, {
       from: String(fromUserId),
       to: String(userId),
@@ -1329,8 +1318,6 @@ const handleUnfriend = async (userId) => {
 
     if (!confirm(`Hủy kết bạn với ${userId}?`)) return;
 
-    console.log("🔄 Unfriending:", userId);
-
     // Call unfriend API
     await api.delete("/trendy/friends/unfriend", {
       params: { userId1: blockerId, userId2: userId },
@@ -1342,7 +1329,6 @@ const handleUnfriend = async (userId) => {
     // Remove from chats if exists
     chats.value = chats.value.filter((c) => c.id !== userId);
 
-    console.log("✅ Unfriended successfully");
     alert("Đã hủy kết bạn");
   } catch (error) {
     console.error("❌ Unfriend failed:", error);
@@ -1397,8 +1383,6 @@ const backToChatList = () => {
 };
 
 const onSent = (payload) => {
-  console.log("message sent", payload);
-
   // Update lastMessage in chat list
   if (selectedChat.value) {
     const chatIdx = chats.value.findIndex(
@@ -1410,7 +1394,31 @@ const onSent = (payload) => {
 
     if (chatIdx >= 0) {
       // Update existing chat
-      chats.value[chatIdx].lastMessage = payload.noiDung || "";
+      // If has attachments, show attachment preview instead of text
+      if (payload.attachments) {
+        try {
+          const attachments = JSON.parse(payload.attachments);
+          const hasImage = attachments.some((a) => {
+            const imageExts = [
+              ".jpg",
+              ".jpeg",
+              ".png",
+              ".gif",
+              ".bmp",
+              ".webp",
+            ];
+            return imageExts.some((ext) => a.name.toLowerCase().endsWith(ext));
+          });
+          chats.value[chatIdx].lastMessage = hasImage
+            ? "Bạn đã gửi hình ảnh"
+            : `Bạn đã gửi ${attachments.length} file`;
+        } catch (e) {
+          chats.value[chatIdx].lastMessage = payload.noiDung || "";
+        }
+      } else {
+        chats.value[chatIdx].lastMessage = payload.noiDung || "";
+      }
+
       chats.value[chatIdx].time = payload.ngayGui || now;
 
       // Move to top of list
@@ -1418,6 +1426,29 @@ const onSent = (payload) => {
       chats.value.unshift(chat);
     } else {
       // New chat - add to list
+      let lastMsg = payload.noiDung || "";
+      if (payload.attachments) {
+        try {
+          const attachments = JSON.parse(payload.attachments);
+          const hasImage = attachments.some((a) => {
+            const imageExts = [
+              ".jpg",
+              ".jpeg",
+              ".png",
+              ".gif",
+              ".bmp",
+              ".webp",
+            ];
+            return imageExts.some((ext) => a.name.toLowerCase().endsWith(ext));
+          });
+          lastMsg = hasImage
+            ? "Bạn đã gửi hình ảnh"
+            : `Bạn đã gửi ${attachments.length} file`;
+        } catch (e) {
+          lastMsg = payload.noiDung || "";
+        }
+      }
+
       const newChat = {
         id: selectedChat.value.id,
         name: selectedChat.value.name,
@@ -1425,7 +1456,7 @@ const onSent = (payload) => {
         gender: selectedChat.value.gender,
         type: selectedChat.value.type,
         maNhomSolo: selectedChat.value.maNhomSolo,
-        lastMessage: payload.noiDung || "",
+        lastMessage: lastMsg,
         time: payload.ngayGui || now,
       };
       chats.value.unshift(newChat);
@@ -1444,14 +1475,12 @@ const loadChats = async () => {
 
   try {
     const userId = user.value.id;
-    console.log("📋 Loading chats for user:", userId);
 
     // ... existing code ...
 
     // Load solo chats
     try {
       const soloRes = await api.get(`/trendy/chat/solo?userId=${userId}`);
-      console.log("📨 Solo chats response:", soloRes.data);
 
       // Use Promise.all to fetch history for each chat in parallel
       const soloChats = await Promise.all(
@@ -1475,8 +1504,36 @@ const loadChats = async () => {
             const messages = historyRes.data || [];
             if (messages.length > 0) {
               const lastMsg = messages[messages.length - 1];
-              chatData.lastMessage = lastMsg.noiDung || "";
               chatData.time = lastMsg.ngayGui || "";
+
+              // Check if has attachments
+              if (lastMsg.attachments) {
+                try {
+                  const attachments = JSON.parse(lastMsg.attachments);
+                  const imageExts = [
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".gif",
+                    ".bmp",
+                    ".webp",
+                  ];
+                  const hasImage = attachments.some((a) =>
+                    imageExts.some((ext) => a.name.toLowerCase().endsWith(ext))
+                  );
+                  chatData.lastMessage = hasImage
+                    ? lastMsg.maNguoiGui === userId
+                      ? "Bạn đã gửi hình ảnh"
+                      : "Đã gửi hình ảnh"
+                    : lastMsg.maNguoiGui === userId
+                    ? `Bạn đã gửi ${attachments.length} file`
+                    : `Đã gửi ${attachments.length} file`;
+                } catch (e) {
+                  chatData.lastMessage = lastMsg.noiDung || "";
+                }
+              } else {
+                chatData.lastMessage = lastMsg.noiDung || "";
+              }
             }
           } catch (e) {
             console.warn("Failed to load chat history for", c.otherUserId, e);
@@ -1499,7 +1556,6 @@ const loadChats = async () => {
     // Load group chats
     try {
       const groupRes = await api.get(`/trendy/chat/group?userId=${userId}`);
-      console.log("📨 Group chats response:", groupRes.data);
 
       // FIX: Map group chats with correct ID field and load latest message time
       const groupChats = await Promise.all(
@@ -1523,8 +1579,36 @@ const loadChats = async () => {
             const messages = historyRes.data || [];
             if (messages.length > 0) {
               const lastMsg = messages[messages.length - 1];
-              chatData.lastMessage = lastMsg.noiDung || "";
               chatData.time = lastMsg.ngayGui || "";
+
+              // Check if has attachments
+              if (lastMsg.attachments) {
+                try {
+                  const attachments = JSON.parse(lastMsg.attachments);
+                  const imageExts = [
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".gif",
+                    ".bmp",
+                    ".webp",
+                  ];
+                  const hasImage = attachments.some((a) =>
+                    imageExts.some((ext) => a.name.toLowerCase().endsWith(ext))
+                  );
+                  chatData.lastMessage = hasImage
+                    ? lastMsg.maNguoiGui === userId
+                      ? "Bạn đã gửi hình ảnh"
+                      : "Đã gửi hình ảnh"
+                    : lastMsg.maNguoiGui === userId
+                    ? `Bạn đã gửi ${attachments.length} file`
+                    : `Đã gửi ${attachments.length} file`;
+                } catch (e) {
+                  chatData.lastMessage = lastMsg.noiDung || "";
+                }
+              } else {
+                chatData.lastMessage = lastMsg.noiDung || "";
+              }
             }
           } catch (e) {
             console.warn("Failed to load group history for", g.maNhom, e);
@@ -1543,8 +1627,6 @@ const loadChats = async () => {
     } catch (e) {
       console.error("❌ Failed to load group chats:", e);
     }
-
-    console.log("📊 Total chats loaded:", chats.value.length);
   } catch (error) {
     console.error("❌ Error loading chats:", error);
     chatError.value = "Không thể tải danh sách chat";
@@ -1592,7 +1674,7 @@ onMounted(async () => {
   while (retries < maxRetries) {
     try {
       await socketService.connect();
-      console.log("STOMP connection established");
+
       chatConnectionState.value = "connected";
       chatError.value = null;
       break;
@@ -1625,7 +1707,7 @@ onMounted(async () => {
   }
 
   // Load chats
-  console.log("📋 Loading chats...");
+
   await loadChats();
 
   // load friends list for group creation
@@ -1650,7 +1732,6 @@ onMounted(async () => {
   try {
     // Load in parallel (Promise.all) instead of sequential
     await Promise.all([loadMessageNotifications(), loadIncomingRequests()]);
-    console.log("✅ All notifications loaded in parallel");
   } catch (e) {
     console.warn("Failed to load initial notifications:", e);
     messageNotifications.value = [];
@@ -1666,8 +1747,6 @@ onMounted(async () => {
           try {
             if (!notif) return;
 
-            console.log("📩 Received WebSocket notification:", notif);
-
             // Push notification into list and increment unread badge
             const existingIdx = messageNotifications.value.findIndex(
               (n) => n.idThongBao === notif.idThongBao
@@ -1675,7 +1754,6 @@ onMounted(async () => {
 
             if (existingIdx >= 0) {
               messageNotifications.value[existingIdx] = notif;
-              console.log("✅ Updated existing notification");
             } else {
               messageNotifications.value.unshift(notif);
               notificationsUnread.value = (notificationsUnread.value || 0) + 1;

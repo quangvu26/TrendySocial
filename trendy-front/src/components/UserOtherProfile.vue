@@ -2,7 +2,6 @@
 f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
 <template>
   <div class="w-full h-screen bg-gray-50 overflow-hidden flex flex-col">
-    <!-- Header -->
     <div
       class="bg-white border-b px-2 py-0 flex items-center justify-between flex-shrink-0"
     >
@@ -15,9 +14,7 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
       <div class="w-10"></div>
     </div>
 
-    <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto">
-      <!-- Profile Header -->
       <div class="bg-white border-b">
         <div class="px-6 py-6 flex flex-col items-center">
           <img
@@ -32,7 +29,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             {{ otherUser?.tieuSu || "Chưa có mô tả" }}
           </p>
 
-          <!-- Action Buttons -->
           <div class="flex gap-2 mb-6">
             <button
               v-if="!isFriend && !hasRequestPending"
@@ -63,7 +59,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             </button>
           </div>
 
-          <!-- Stats -->
           <div class="flex gap-12 mb-6">
             <div class="text-center">
               <p class="font-bold text-lg">{{ postsCount }}</p>
@@ -79,7 +74,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             </div>
           </div>
 
-          <!-- Tabs -->
           <div class="flex gap-12 text-sm border-t w-full justify-center pt-3">
             <button
               @click="activeTab = 'posts'"
@@ -94,7 +88,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
           </div>
         </div>
 
-        <!-- Posts Grid -->
         <div class="px-4 py-4">
           <div v-if="isLoading" class="text-center py-12">
             <i
@@ -130,7 +123,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
                 <i class="bi bi-image text-gray-400 text-3xl"></i>
               </div>
 
-              <!-- Overlay Stats -->
               <div
                 class="post-overlay absolute inset-0 bg-black transition-all duration-300 flex items-center justify-center gap-6"
               >
@@ -160,7 +152,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
     </div>
   </div>
 
-  <!-- Post Detail Modal -->
   <Teleport to="body">
     <div
       v-if="showPostDetailModal && selectedPost"
@@ -171,7 +162,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
       <div
         class="bg-white rounded-lg w-full max-w-4xl h-[600px] overflow-hidden flex"
       >
-        <!-- Left: Image Full Size -->
         <div class="flex-1 bg-black flex items-center justify-center relative">
           <img
             v-if="selectedPost.images && selectedPost.images.length > 0"
@@ -181,9 +171,7 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
           />
         </div>
 
-        <!-- Right: Comments & Info (Narrow) -->
         <div class="w-96 flex flex-col bg-white h-full border-l">
-          <!-- Post Header -->
           <div class="p-3 border-b flex-shrink-0">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-start gap-2 flex-1">
@@ -209,7 +197,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             </div>
           </div>
 
-          <!-- Post Content -->
           <div class="px-3 py-2 border-b flex-shrink-0">
             <p class="text-sm text-gray-800 line-clamp-2">
               {{ selectedPost.content }}
@@ -219,7 +206,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             </p>
           </div>
 
-          <!-- Comments List - Scrollable -->
           <div class="flex-1 overflow-y-auto p-2 space-y-2 min-h-0">
             <div
               v-if="
@@ -237,7 +223,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
                 :key="comment.id"
                 class="border-l-2 border-gray-200 pl-3 pb-2"
               >
-                <!-- Comment Item -->
                 <div class="flex gap-3">
                   <img
                     :src="
@@ -304,7 +289,7 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
                         </div>
                       </div>
                     </div>
-                    <!-- Actions -->
+
                     <div class="flex gap-4 mt-2 text-xs text-gray-500">
                       <button
                         @click="toggleCommentLike(comment)"
@@ -341,7 +326,6 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
                   </div>
                 </div>
 
-                <!-- Replies Section -->
                 <div
                   v-if="comment.replies && comment.replies.length > 0"
                   class="mt-2 ml-14"
@@ -414,7 +398,7 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
                             </div>
                           </div>
                         </div>
-                        <!-- Reply Actions -->
+
                         <div class="flex gap-3 mt-1 text-xs text-gray-500">
                           <button
                             @click="toggleReplyLike(reply)"
@@ -442,9 +426,7 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
             </div>
           </div>
 
-          <!-- Footer: Actions + Comment Input -->
           <div class="border-t p-3 space-y-2 flex-shrink-0">
-            <!-- Action Buttons -->
             <div class="flex items-center gap-3 justify-between">
               <div class="flex items-center gap-3">
                 <button
@@ -486,12 +468,10 @@ f:\Du_An\TrendySocialApp\trendy-front\src\components\UserOtherProfile.vue
               </button>
             </div>
 
-            <!-- Like Count -->
             <div class="text-xs font-medium">
               {{ selectedPost.likes }} lượt thích
             </div>
 
-            <!-- Comment Input -->
             <div class="flex gap-2 border-t pt-3">
               <input
                 v-model="newComment"
@@ -681,10 +661,6 @@ const submitComment = async () => {
       maTraLoi: replyToId || null,
     };
 
-    console.log("📤 Submitting comment payload:", payload);
-    console.log("📤 Post ID:", selectedPost.value.id);
-    console.log("📤 Token exists:", !!token.value);
-
     const commentRes = await api.post(
       `/trendy/posts/${selectedPost.value.id}/comment`,
       payload,
@@ -793,7 +769,6 @@ const submitComment = async () => {
 
     newComment.value = "";
     selectedPost.value.replyingToComment = null;
-    console.log("✅ Comment posted successfully:", newReply);
   } catch (error) {
     console.error("Failed to submit comment:", error);
     console.error("Response data:", error.response?.data);
@@ -840,7 +815,6 @@ const toggleCommentLike = async (comment) => {
       } else {
         comment.likes = Math.max(0, (comment.likes || 0) - 1);
       }
-      console.log("✅ Comment unliked, likes:", comment.likes);
     } else {
       const likeRes = await api.post(
         `/trendy/posts/${selectedPost.value.id}/comment/${comment.id}/like`,
@@ -853,7 +827,6 @@ const toggleCommentLike = async (comment) => {
       } else {
         comment.likes = (comment.likes || 0) + 1;
       }
-      console.log("✅ Comment liked, likes:", comment.likes);
     }
   } catch (error) {
     console.error("Failed to toggle comment like:", error);
@@ -951,7 +924,21 @@ const loadUserProfile = async () => {
 
       posts.value = posts.value.filter((p) => p !== null);
       postsCount.value = publicPosts.length;
-      likesCount.value = posts.value.filter((p) => p.liked).length;
+
+      // Load total likes received from API
+      try {
+        const totalLikesRes = await api.get(
+          `/trendy/posts/user/${props.userId}/total-likes`
+        );
+        likesCount.value = totalLikesRes.data?.totalLikes || 0;
+      } catch (e) {
+        console.warn("Failed to load total likes:", e);
+        // Fallback to local calculation
+        likesCount.value = posts.value.reduce(
+          (total, p) => total + (p.likes || 0),
+          0
+        );
+      }
     } catch (e) {
       console.error("Failed to load posts:", e);
       posts.value = [];
@@ -1065,7 +1052,6 @@ const incrementPostView = async (postId) => {
     if (post) {
       post.views = (post.views || 0) + 1;
     }
-    console.log("✅ View counted for post:", postId);
   } catch (error) {
     console.error("Failed to count view:", error);
   }
@@ -1078,6 +1064,10 @@ const loadPostComments = async (postId) => {
     });
 
     if (commentsRes.data) {
+      console.log(
+        "📝 Raw Comments from API:",
+        JSON.stringify(commentsRes.data, null, 2)
+      );
       const enrichedComments = await Promise.all(
         commentsRes.data.map(async (c) => {
           try {
@@ -1089,6 +1079,24 @@ const loadPostComments = async (postId) => {
                 headers: { Authorization: `Bearer ${token.value}` },
               })
               .catch(() => ({ data: { liked: false } }));
+
+            // Get correct likes count from API
+            const likesCountRes = await api
+              .get(`/trendy/posts/${postId}/comment/${c.id}/likes`, {
+                headers: { Authorization: `Bearer ${token.value}` },
+                timeout: 5000, // 5 second timeout
+              })
+              .catch((err) => {
+                console.warn(
+                  `⚠️ Failed to get likes count for comment ${c.id}:`,
+                  err.message
+                );
+                return { data: { likesCount: c.likes || 0 } };
+              });
+            console.log(
+              `📌 Comment ${c.id} likes from API:`,
+              likesCountRes.data
+            );
 
             // Load replies
             let replies = [];
@@ -1113,6 +1121,21 @@ const loadPostComments = async (postId) => {
                         }
                       )
                       .catch(() => ({ data: { liked: false } }));
+                    const replyLikesCountRes = await api
+                      .get(
+                        `/trendy/posts/${postId}/comment/${reply.id}/likes`,
+                        {
+                          headers: { Authorization: `Bearer ${token.value}` },
+                          timeout: 5000,
+                        }
+                      )
+                      .catch((err) => {
+                        console.warn(
+                          `⚠️ Failed to get likes for reply ${reply.id}:`,
+                          err.message
+                        );
+                        return { data: { likesCount: reply.likes || 0 } };
+                      });
                     return {
                       ...reply,
                       authorName:
@@ -1122,7 +1145,8 @@ const loadPostComments = async (postId) => {
                       authorAvatar:
                         replyUserData.avatar ||
                         "/images/Avatar/male_avatar.png",
-                      likes: reply.likes || 0,
+                      likes:
+                        replyLikesCountRes.data?.likesCount || reply.likes || 0,
                       liked: replyLikedRes.data?.liked || false,
                       showMenu: false,
                     };
@@ -1144,7 +1168,7 @@ const loadPostComments = async (postId) => {
               ...c,
               authorName: userData.ten || userData.name || c.authorId,
               authorAvatar: userData.avatar || "/images/Avatar/male_avatar.png",
-              likes: likesCount,
+              likes: likesCountRes.data?.likesCount || c.likes || 0,
               liked: likedRes.data?.liked || false,
               replies: replies,
               showReplies: false,
@@ -1164,7 +1188,6 @@ const loadPostComments = async (postId) => {
       );
 
       selectedPost.value.commentsList = enrichedComments;
-      console.log("✅ Loaded comments:", selectedPost.value.commentsList);
     }
   } catch (error) {
     console.error("Failed to load comments:", error);
@@ -1231,9 +1254,20 @@ const toggleLike = async (postId) => {
       selectedPost.value.likes = post.likes;
     }
 
-    likesCount.value = posts.value.filter((p) => p.liked).length;
-
-    console.log("✅ Post liked updated");
+    // Recalculate total likes from API
+    try {
+      const totalLikesRes = await api.get(
+        `/trendy/posts/user/${props.userId}/total-likes`
+      );
+      likesCount.value = totalLikesRes.data?.totalLikes || 0;
+    } catch (e) {
+      console.warn("Failed to reload total likes:", e);
+      // Fallback to local calculation
+      likesCount.value = posts.value.reduce(
+        (total, p) => total + (p.likes || 0),
+        0
+      );
+    }
   } catch (error) {
     console.error("Failed to toggle like:", error);
   }

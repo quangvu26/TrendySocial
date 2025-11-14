@@ -22,8 +22,6 @@ const createClient = () => {
 const connect = ({ onConnect, onError } = {}) => {
   try {
     const client = createClient();
-
-    // Attach token if available
     const token = storage.getToken();
     if (token) client.connectHeaders = { Authorization: `Bearer ${token}` };
 

@@ -1,8 +1,3 @@
-/**
- * Reusable async check functions
- * Centralized for email & ID uniqueness checks
- */
-
 import { checkEmail, checkId } from "../api/authService";
 import { validateEmail } from "./validators";
 

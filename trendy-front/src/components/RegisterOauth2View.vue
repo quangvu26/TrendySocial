@@ -4,7 +4,6 @@
     :style="{ backgroundImage: `url(/images/FormLogin/background_form.png)` }"
   >
     <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
-      <!-- Logo Section -->
       <div class="flex flex-col items-center space-y-3 mb-6">
         <div
           class="w-16 h-16 rounded-full bg-[#FF5630] flex items-center justify-center"
@@ -30,7 +29,6 @@
           {{ errors.submit }}
         </div>
 
-        <!-- ID Input -->
         <div>
           <label class="block text-sm font-medium mb-1">ID</label>
           <input
@@ -44,7 +42,6 @@
           </p>
         </div>
 
-        <!-- Name Input -->
         <div>
           <label class="block text-sm font-medium mb-1">Tên</label>
           <input
@@ -55,7 +52,6 @@
           />
         </div>
 
-        <!-- Email Input (ReadOnly) -->
         <div>
           <label class="block text-sm font-medium mb-1">Email</label>
           <input
@@ -66,7 +62,6 @@
           />
         </div>
 
-        <!-- Password Input -->
         <div>
           <label class="block text-sm font-medium mb-1">Mật khẩu</label>
           <input
@@ -80,7 +75,6 @@
           </p>
         </div>
 
-        <!-- Gender Select -->
         <div>
           <label class="block text-sm font-medium mb-1">Giới tính</label>
           <select
@@ -92,7 +86,6 @@
           </select>
         </div>
 
-        <!-- Birthdate Input -->
         <div>
           <label class="block text-sm font-medium mb-1">Ngày sinh</label>
           <input
@@ -102,7 +95,6 @@
           />
         </div>
 
-        <!-- Submit Button -->
         <button
           type="submit"
           :disabled="isLoading"

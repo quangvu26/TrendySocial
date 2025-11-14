@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { storage } from "../utils/storage";
-import { startTokenRefresh, stopTokenRefresh } from '../api/tokenRefreshService';
+import {
+  startTokenRefresh,
+  stopTokenRefresh,
+} from "../api/tokenRefreshService";
 
 const routes = [
   {
@@ -61,16 +64,6 @@ router.beforeEach((to, from, next) => {
   const token = getTokenDirect();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
-  console.log("🔐 Router guard:", {
-    to: to.path,
-    from: from.path,
-    port: port,
-    tokenKey: tokenKey,
-    hasToken: !!token,
-    tokenLength: token ? token.length : 0,
-    requiresAuth: requiresAuth,
-  });
-
   // If route requires authentication
   if (requiresAuth) {
     if (!token) {
@@ -101,8 +94,6 @@ router.beforeEach((to, from, next) => {
         next("/login");
         return;
       }
-
-      console.log("✅ Token valid, allowing access to", to.path);
     } catch (e) {
       console.error("❌ Invalid token format:", e);
       localStorage.removeItem(tokenKey);
@@ -123,7 +114,6 @@ router.beforeEach((to, from, next) => {
         const exp = payload.exp;
         // Only redirect if token is still valid
         if (!exp || exp * 1000 > Date.now()) {
-          console.log("✅ Valid token detected, redirecting to /chat");
           next("/chat");
           return;
         }
@@ -134,15 +124,14 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  console.log("✅ Allowing access to", to.path);
   next();
 });
 
 // After defining router, add afterEach hook
 router.afterEach((to, from) => {
   const token = storage.getToken();
-  
-  if (token && to.path === '/chat') {
+
+  if (token && to.path === "/chat") {
     // User is logged in and on chat page - start auto-refresh
     startTokenRefresh();
   } else if (!token) {

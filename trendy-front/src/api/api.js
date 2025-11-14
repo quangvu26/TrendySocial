@@ -37,23 +37,18 @@ api.interceptors.response.use(
           storage.removeUser();
 
           if (!onAuthPage) {
-            // only redirect when not already on an auth-related page
             window.location.href = "/login";
           }
         } catch (e) {
           console.warn("Error while handling auth redirect", e);
         }
       }
-
-      // Log server errors for debugging
       if (error.response.status >= 500) {
         console.error("Server error:", error.response.data);
       }
     } else if (error.request) {
-      // Network error
       console.error("Network error - server unreachable");
     }
-    // let the caller handle the error (so components can display field-level validation)
     return Promise.reject(error);
   }
 );

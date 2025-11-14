@@ -23,11 +23,6 @@ export const getPendingRequests = (userId) =>
 export const getRelations = (userId) =>
   api.get("/trendy/friends/relations", { params: { userId } });
 
-/**
- * Validate friend action trước khi thực hiện
- * action: 'send', 'cancel', 'unfriend'
- * Returns: { valid: boolean, error: string, currentStatus: string }
- */
 export const validateFriendAction = async (action, myUserId, friendId) => {
   try {
     const res = await api.get("/trendy/friends/status", {
@@ -35,8 +30,6 @@ export const validateFriendAction = async (action, myUserId, friendId) => {
     });
 
     const status = res.data?.status;
-
-    // Validate action based on status
     switch (action) {
       case "send":
         if (status === "accepted") {

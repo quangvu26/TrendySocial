@@ -1,15 +1,12 @@
 <template>
-  <!-- Create Post Modal -->
   <div
     v-if="!postContent && !selectedFile"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
     @click.self="handleClose"
   >
-    <!-- Stage 1: Select File -->
     <div class="bg-white rounded-lg w-full max-w-md p-8 text-center">
       <h2 class="text-xl font-bold mb-6">Tạo bài đăng mới</h2>
 
-      <!-- Upload Area -->
       <div
         @drop.prevent="handleDrop"
         @dragover.prevent
@@ -24,7 +21,6 @@
         <p class="text-gray-600 text-sm mb-3">Kéo ảnh hoặc video vào đây</p>
       </div>
 
-      <!-- Select Button -->
       <button
         @click="fileInput.click()"
         class="w-full px-4 py-2 bg-[#FF5630] text-white rounded-lg hover:bg-[#FF4520] transition-colors font-medium"
@@ -32,7 +28,6 @@
         Chọn từ máy tính
       </button>
 
-      <!-- Close Button -->
       <button
         @click="handleClose"
         class="mt-3 w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -40,7 +35,6 @@
         Hủy
       </button>
 
-      <!-- Hidden File Input -->
       <input
         ref="fileInput"
         type="file"
@@ -51,7 +45,6 @@
     </div>
   </div>
 
-  <!-- Stage 2: Edit Post -->
   <div
     v-else
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -60,7 +53,6 @@
     <div
       class="bg-white rounded-lg w-full max-w-2xl max-h-96 overflow-hidden flex flex-col"
     >
-      <!-- Header -->
       <div
         class="px-6 py-4 border-b flex items-center justify-between flex-shrink-0"
       >
@@ -70,9 +62,7 @@
         </button>
       </div>
 
-      <!-- Content -->
       <div class="flex-1 overflow-auto flex">
-        <!-- Preview Image/Video (Left) -->
         <div class="w-1/3 bg-gray-100 flex items-center justify-center">
           <img
             v-if="isImage"
@@ -86,9 +76,7 @@
           ></video>
         </div>
 
-        <!-- Post Form (Right) -->
         <div class="flex-1 p-6 flex flex-col">
-          <!-- User Info -->
           <div class="flex items-center gap-3 mb-4 pb-4 border-b">
             <img
               :src="userAvatar"
@@ -102,7 +90,6 @@
             </div>
           </div>
 
-          <!-- Text Input with Emoji -->
           <div class="flex-1 flex flex-col mb-4">
             <div class="relative">
               <textarea
@@ -112,7 +99,6 @@
                 class="w-full p-3 pl-10 pr-12 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#FF5630]"
               ></textarea>
 
-              <!-- Emoji Button (Bottom Left) -->
               <button
                 @click="showEmojiPicker = true"
                 class="absolute bottom-2 left-2 p-1 hover:bg-gray-100 rounded"
@@ -121,16 +107,13 @@
                 <i class="bi bi-emoji-smile text-lg text-yellow-500"></i>
               </button>
 
-              <!-- Character Counter (Bottom Right) -->
               <span class="absolute bottom-2 right-2 text-xs text-gray-500">
                 {{ postContent.length }}/2200
               </span>
             </div>
           </div>
 
-          <!-- Settings -->
           <div class="space-y-3 text-sm border-t pt-4">
-            <!-- Privacy -->
             <div class="flex items-center justify-between">
               <label class="flex items-center gap-2">
                 <i class="bi bi-eye text-lg"></i>
@@ -145,65 +128,10 @@
                 <option value="RIENG_TU">Một mình</option>
               </select>
             </div>
-
-            <!-- Comment Setting -->
-            <div class="flex items-center justify-between">
-              <label class="flex items-center gap-2">
-                <i class="bi bi-chat-left text-lg"></i>
-                <span>Ẩn bình luận</span>
-              </label>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  v-model="hideComments"
-                  type="checkbox"
-                  class="sr-only peer"
-                />
-                <div
-                  class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                ></div>
-              </label>
-            </div>
-
-            <!-- Like Setting -->
-            <div class="flex items-center justify-between">
-              <label class="flex items-center gap-2">
-                <i class="bi bi-heart text-lg"></i>
-                <span>Ẩn lượt thích</span>
-              </label>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  v-model="hideLikes"
-                  type="checkbox"
-                  class="sr-only peer"
-                />
-                <div
-                  class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                ></div>
-              </label>
-            </div>
-
-            <!-- View Setting -->
-            <div class="flex items-center justify-between">
-              <label class="flex items-center gap-2">
-                <i class="bi bi-eye-fill text-lg"></i>
-                <span>Ẩn lượt xem</span>
-              </label>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  v-model="hideViews"
-                  type="checkbox"
-                  class="sr-only peer"
-                />
-                <div
-                  class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FF5630]"
-                ></div>
-              </label>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Footer with Post Button -->
       <div class="px-6 py-4 border-t flex justify-end gap-3 flex-shrink-0">
         <button
           @click="handleClose"
@@ -222,7 +150,6 @@
     </div>
   </div>
 
-  <!-- Emoji Picker Modal -->
   <div
     v-if="showEmojiPicker"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -252,7 +179,6 @@
     </div>
   </div>
 
-  <!-- Cancel Confirmation Modal -->
   <div
     v-if="showCancelConfirm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -325,7 +251,6 @@ const loadUser = async () => {
         avatar: response.data.avatar,
         gioiTinh: response.data.gioi_tinh || response.data.gioiTinh,
       };
-      console.log("✅ User from API:", user.value);
     }
   } catch (error) {
     console.error("❌ Failed:", error);

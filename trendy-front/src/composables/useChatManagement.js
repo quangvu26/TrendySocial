@@ -150,7 +150,6 @@ export const useChatManagement = () => {
         }
       });
 
-      console.log("✅ Friend statuses loaded:", friendRequests.value);
       return { success: true };
     } catch (error) {
       console.error("Load friend statuses failed:", error);

@@ -32,7 +32,6 @@
             @click="selectChat(chat)"
             class="flex items-center flex-1 min-w-0"
           >
-            <!-- Avatar with unread indicator -->
             <div class="relative flex-shrink-0">
               <img
                 :src="avatarFor(chat)"
@@ -82,7 +81,6 @@
             </div>
           </div>
 
-          <!-- Three dots menu -->
           <div class="relative flex-shrink-0">
             <button
               @click.stop="toggleMenu(chat.id)"
@@ -91,7 +89,6 @@
               <i class="bi bi-three-dots text-lg sm:text-base"></i>
             </button>
 
-            <!-- Dropdown menu -->
             <div
               v-if="activeMenu === chat.id"
               @click.stop
@@ -123,9 +120,7 @@
       </div>
     </div>
 
-    <!-- Create Group Panel (fixed, aligned with left-side panels) -->
     <div v-if="showCreateGroup">
-      <!-- Overlay -->
       <div
         class="fixed inset-0 bg-black bg-opacity-25 z-40"
         @click="showCreateGroup = false"

@@ -7,7 +7,6 @@
       class="w-full max-w-5xl bg-white/95 rounded-2xl overflow-hidden shadow-2xl mx-4"
     >
       <div class="grid grid-cols-1 md:grid-cols-2">
-        <!-- Left side - Illustration -->
         <div
           class="hidden md:flex items-center justify-center bg-orange-50 p-10"
         >
@@ -18,9 +17,7 @@
           />
         </div>
 
-        <!-- Right side - Login Form -->
         <div class="p-10 flex flex-col justify-center">
-          <!-- Logo Section -->
           <div class="flex flex-col items-center space-y-3 mb-6">
             <div
               class="w-20 h-20 rounded-full bg-[#FF5630] flex items-center justify-center"
@@ -35,9 +32,7 @@
             <p class="text-sm text-gray-600">Share the vibe, start the trend</p>
           </div>
 
-          <!-- Login Form -->
           <form @submit.prevent="handleLogin" class="space-y-4">
-            <!-- Email Input -->
             <div>
               <input
                 v-model="email"
@@ -51,7 +46,6 @@
               </p>
             </div>
 
-            <!-- Password Input -->
             <div>
               <input
                 v-model="password"
@@ -65,12 +59,10 @@
               </p>
             </div>
 
-            <!-- Global Error Message -->
             <p v-if="error" class="text-center text-sm text-red-600">
               {{ error }}
             </p>
 
-            <!-- Forgot Password Link -->
             <div class="flex justify-end">
               <router-link
                 to="/forgot-password"
@@ -80,7 +72,6 @@
               </router-link>
             </div>
 
-            <!-- Login Button -->
             <button
               type="submit"
               :disabled="isLoading"
@@ -90,10 +81,8 @@
             </button>
           </form>
 
-          <!-- Divider -->
           <div class="text-center text-sm text-gray-600 my-4">Hoặc</div>
 
-          <!-- Google Login Button -->
           <button
             @click="handleGoogleLogin"
             type="button"
@@ -107,7 +96,6 @@
             Đăng nhập bằng Google
           </button>
 
-          <!-- Sign Up Link -->
           <div class="text-center text-sm mt-4">
             <span class="text-gray-600">Bạn chưa có tài khoản? </span>
             <router-link
@@ -197,7 +185,6 @@ const handleLogin = async () => {
 
       const token = responseData.token;
       saveToken(token);
-      console.log("✅ Token saved:", token.substring(0, 20) + "...");
 
       // Parse token to get userId and email
       try {
@@ -217,8 +204,6 @@ const handleLogin = async () => {
           avatar: responseData.avatar || "",
         };
         storage.setUser(userInfo);
-
-        console.log("✅ Login successful, user:", userInfo);
 
         // Navigate to chat
         router.push("/chat");

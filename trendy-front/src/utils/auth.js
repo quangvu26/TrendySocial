@@ -8,12 +8,8 @@ import { storage } from "./storage";
  * - App detects authentication error
  */
 export function clearAuthData() {
-  console.log("🧹 Clearing all authentication data...");
-
   storage.clear();
   sessionStorage.clear();
-
-  console.log("✅ Authentication data cleared");
 }
 
 /**

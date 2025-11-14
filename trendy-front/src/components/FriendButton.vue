@@ -1,4 +1,3 @@
-<!-- filepath: f:\Du_An\TrendySocialApp\trendy-front\src\components\FriendButton.vue -->
 <template>
   <button
     @click="handleClick"
@@ -63,8 +62,6 @@ const buttonTitle = computed(() => {
 const handleClick = async () => {
   if (isButtonDisabled.value) return;
 
-  console.log(`🔄 Friend button clicked. Current state: ${friendState.value}`);
-
   const result = await handleButtonClick(props.myUserId, props.friendId);
 
   if (!result.success) {
@@ -74,13 +71,10 @@ const handleClick = async () => {
 
   // Emit appropriate event based on action
   if (result.action === "send") {
-    console.log("✅ Friend request sent");
     emit("request-sent", props.friendId);
   } else if (result.action === "cancel") {
-    console.log("✅ Friend request cancelled");
     emit("request-cancelled", props.friendId);
   } else if (result.action === "unfriend") {
-    console.log("✅ Unfriended");
     emit("unfriend", props.friendId);
   }
 

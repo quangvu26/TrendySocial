@@ -1,9 +1,4 @@
 /**
- * Centralized Error Handler
- * Xử lý tất cả lỗi từ API responses
- */
-
-/**
  * Extract error message từ error object
  * @param {Error} error - Error object từ API
  * @param {string} defaultMsg - Default message nếu không tìm được

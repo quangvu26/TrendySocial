@@ -14,11 +14,6 @@ const router = useRouter();
 
 onMounted(async () => {
   try {
-    console.log("🔄 OAuth redirect handler started");
-    console.log("URL:", window.location.href);
-    console.log("Query params:", route.query);
-    console.log("Hash:", window.location.hash);
-
     // Try URL query params first (?token=...)
     let token = route.query.token;
     let oauthEmail = route.query.email;
@@ -45,7 +40,6 @@ onMounted(async () => {
 
     // Case 1: Has token → go to chat
     if (token && token.trim().length > 0) {
-      console.log("✅ Token found, saving and redirecting to chat");
       saveToken(token);
       await router.replace("/chat");
       return;
@@ -53,7 +47,6 @@ onMounted(async () => {
 
     // Case 2: Has OAuth data → go to register
     if (oauthEmail && oauthEmail.trim().length > 0) {
-      console.log("✅ OAuth data found, redirecting to register-oauth2");
       const oauthData = {
         email: decodeURIComponent(oauthEmail),
         name: oauthName ? decodeURIComponent(oauthName) : "",

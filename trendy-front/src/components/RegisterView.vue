@@ -7,7 +7,6 @@
       class="w-full max-w-3xl bg-white/95 rounded-2xl overflow-hidden shadow-2xl mx-4"
     >
       <div class="p-8 flex flex-col justify-center">
-        <!-- Logo -->
         <div class="flex flex-col items-center space-y-3 mb-6">
           <div class="flex items-center space-x-4">
             <div
@@ -24,7 +23,6 @@
           <p class="text-sm text-gray-600">Share the vibe, start the trend</p>
         </div>
 
-        <!-- Progress Indicator -->
         <div class="flex justify-center mb-8">
           <div class="flex items-center space-x-2">
             <div
@@ -48,12 +46,10 @@
           </div>
         </div>
 
-        <!-- Error Message -->
         <p v-if="error" class="text-center text-sm text-red-600 mb-4">
           {{ error }}
         </p>
 
-        <!-- Step 1: Basic Info -->
         <div v-if="currentStep === 1" class="space-y-4">
           <h3 class="text-xl font-medium mb-6">Tạo tài khoản</h3>
           <form @submit.prevent="nextStep" class="space-y-4">
@@ -143,7 +139,6 @@
           </form>
         </div>
 
-        <!-- Step 2: Birthdate -->
         <div v-if="currentStep === 2" class="space-y-4">
           <h3 class="text-xl font-medium mb-6">Ngày sinh</h3>
           <form @submit.prevent="nextStep" class="space-y-4">
@@ -172,7 +167,6 @@
           </form>
         </div>
 
-        <!-- Step 3: Verify Code -->
         <div v-if="currentStep === 3" class="space-y-4">
           <h3 class="text-xl font-medium mb-6">Xác nhận Email</h3>
           <p class="text-sm text-gray-600 mb-4">
@@ -220,7 +214,6 @@
           </form>
         </div>
 
-        <!-- Login Link -->
         <p class="text-center text-sm text-gray-600 mt-4">
           Bạn đã có tài khoản?
           <router-link
@@ -364,24 +357,13 @@ const prevStep = () => {
     error.value = "";
   }
 };
-
-// ✅ REGISTER & SEND CODE
 const handleRegisterAndSendCode = async () => {
   error.value = "";
   isLoading.value = true;
 
   try {
-    console.log("📝 Registering user...");
-
-    // Attempt registration
     const regRes = await register(form.value);
-    console.log("✅ Registration successful");
-
-    // Send verification code after registration
-    console.log("📧 Sending verification code...");
     await sendVerificationCode(form.value.email);
-    console.log("✅ Verification code sent");
-
     startResendTimer();
     currentStep.value++;
   } catch (err) {

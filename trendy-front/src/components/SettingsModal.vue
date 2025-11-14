@@ -1,7 +1,8 @@
 <template>
-  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9998]"
+  >
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-      <!-- Header -->
       <div class="p-4 border-b flex items-center justify-between">
         <h3 class="font-semibold text-lg">Cài đặt</h3>
         <button
@@ -12,56 +13,32 @@
         </button>
       </div>
 
-      <!-- Content -->
       <div class="p-4 space-y-3">
-        <!-- Account Settings -->
         <div class="space-y-2">
           <h4 class="font-medium text-sm text-gray-700">Tài khoản</h4>
 
           <button
-            @click="$emit('navigate', 'profile')"
+            @click="openEditProfile"
             class="w-full flex items-center px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors"
           >
             <i class="bi bi-person text-xl text-gray-600"></i>
-            <span class="ml-3 flex-1 text-left">Thông tin cá nhân</span>
+            <span class="ml-3 flex-1 text-left"
+              >Chỉnh sửa thông tin cá nhân</span
+            >
             <i class="bi bi-chevron-right text-gray-400"></i>
           </button>
 
           <button
+            @click="openBlockedUsersAndClose"
             class="w-full flex items-center px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors"
           >
-            <i class="bi bi-shield-lock text-xl text-gray-600"></i>
-            <span class="ml-3 flex-1 text-left">Quyền riêng tư</span>
-            <i class="bi bi-chevron-right text-gray-400"></i>
-          </button>
-        </div>
-
-        <div class="border-t"></div>
-
-        <!-- App Settings -->
-        <div class="space-y-2">
-          <h4 class="font-medium text-sm text-gray-700">Ứng dụng</h4>
-
-          <button
-            @click="$emit('navigate', 'blocked')"
-            class="w-full flex items-center px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <i class="bi bi-shield-slash text-xl text-gray-600"></i>
-            <span class="ml-3 flex-1 text-left">Người dùng đã chặn</span>
-            <i class="bi bi-chevron-right text-gray-400"></i>
-          </button>
-
-          <button
-            class="w-full flex items-center px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors"
-          >
-            <i class="bi bi-palette text-xl text-gray-600"></i>
-            <span class="ml-3 flex-1 text-left">Giao diện</span>
+            <i class="bi bi-ban text-xl text-gray-600"></i>
+            <span class="ml-3 flex-1 text-left">Danh sách chặn</span>
             <i class="bi bi-chevron-right text-gray-400"></i>
           </button>
         </div>
         <div class="border-t"></div>
 
-        <!-- Logout -->
         <button
           @click="$emit('logout')"
           class="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -72,10 +49,33 @@
       </div>
     </div>
   </div>
+
+  <EditProfile
+    v-if="showEditProfile"
+    @close="showEditProfile = false"
+    @updated="$emit('updated')"
+  />
 </template>
 
 <script setup>
-defineEmits(["close", "logout", "navigate"]);
+import { ref } from "vue";
+import EditProfile from "./EditProfile.vue";
+
+const emit = defineEmits(["close", "logout", "navigate", "show-blocked-users"]);
+const showEditProfile = ref(false);
+const isDarkMode = ref(localStorage.getItem("darkMode") === "true");
+
+const openEditProfile = () => {
+  showEditProfile.value = true;
+};
+
+const openBlockedUsersAndClose = () => {
+  emit("show-blocked-users");
+  setTimeout(() => {
+    emit("close");
+  }, 0);
+};
+
 </script>
 
 <style scoped></style>

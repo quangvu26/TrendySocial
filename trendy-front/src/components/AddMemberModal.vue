@@ -8,7 +8,6 @@
       <div
         class="bg-white rounded-lg shadow-lg w-96 max-h-[600px] flex flex-col"
       >
-        <!-- Header -->
         <div class="p-4 border-b flex justify-between items-center">
           <h3 class="font-semibold text-lg">Thêm thành viên nhóm</h3>
           <button
@@ -19,7 +18,6 @@
           </button>
         </div>
 
-        <!-- Search bar -->
         <div class="p-3 border-b">
           <input
             v-model="searchQuery"
@@ -28,7 +26,6 @@
           />
         </div>
 
-        <!-- Friends list -->
         <div class="flex-1 overflow-y-auto p-3">
           <div
             v-if="filteredFriends.length === 0"
@@ -43,7 +40,6 @@
             class="flex items-center p-2 hover:bg-gray-50 rounded mb-2 cursor-pointer"
             @click="toggleFriend(friend.id)"
           >
-            <!-- Radio/Checkbox -->
             <input
               type="checkbox"
               :checked="selectedFriends.includes(friend.id)"
@@ -51,7 +47,6 @@
               class="w-4 h-4 cursor-pointer"
             />
 
-            <!-- Friend info -->
             <img
               :src="friend.avatar || '/images/Avatar/male_avatar.png'"
               class="w-10 h-10 rounded-full object-cover ml-3"
@@ -63,7 +58,6 @@
               <div class="text-xs text-gray-500">@{{ friend.id }}</div>
             </div>
 
-            <!-- Status badge -->
             <span
               v-if="isAlreadyMember(friend.id)"
               class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded"
@@ -73,7 +67,6 @@
           </div>
         </div>
 
-        <!-- Footer -->
         <div class="p-4 border-t flex justify-end space-x-2">
           <button
             @click="close"

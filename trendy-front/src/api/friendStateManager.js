@@ -1,50 +1,24 @@
-// File này KHÔNG SỬ DỤNG - logic đã merge vào useHeaderButtonState.js
-// Giữ lại để reference nếu cần, nhưng đừng import
-// Xóa file này sau
 
-// filepath: f:\Du_An\TrendySocialApp\trendy-front\src\api\friendStateManager.js
 import api from "./api";
-import { storage } from "../utils/storage";
-
-/**
- * Friend state manager - handles all friend-related operations
- * Maintains consistent state across the app
- */
 class FriendStateManager {
   constructor() {
-    this.friendStates = {}; // { userId: 'friend' | 'pending' | 'blocked' | 'none' }
+    this.friendStates = {}; 
     this.listeners = [];
   }
-
-  /**
-   * Subscribe to friend state changes
-   */
   subscribe(callback) {
     this.listeners.push(callback);
     return () => {
       this.listeners = this.listeners.filter((l) => l !== callback);
     };
   }
-
-  /**
-   * Notify all listeners of state change
-   */
   notifyChange(userId, newState) {
     this.listeners.forEach((callback) => {
       callback({ userId, state: newState });
     });
   }
-
-  /**
-   * Get friend state
-   */
   getState(userId) {
     return this.friendStates[userId] || "none";
   }
-
-  /**
-   * Load all friend states for user
-   */
   async loadStates(userId) {
     try {
       const res = await api.get("/trendy/friends/relations", {
@@ -63,17 +37,12 @@ class FriendStateManager {
         }
       });
 
-      console.log("✅ Friend states loaded:", this.friendStates);
       return true;
     } catch (error) {
       console.error("❌ Failed to load friend states:", error);
       return false;
     }
   }
-
-  /**
-   * Send friend request
-   */
   async sendRequest(fromId, toId) {
     try {
       await api.post("/trendy/friends/request", { from: fromId, to: toId });
@@ -85,10 +54,6 @@ class FriendStateManager {
       return { success: false, error };
     }
   }
-
-  /**
-   * Cancel friend request
-   */
   async cancelRequest(fromId, toId) {
     try {
       const relRes = await api.get("/trendy/friends/relations", {
@@ -114,10 +79,6 @@ class FriendStateManager {
       return { success: false, error };
     }
   }
-
-  /**
-   * Unfriend user
-   */
   async unfriend(userId1, userId2) {
     try {
       await api.delete("/trendy/friends/unfriend", {
@@ -131,10 +92,6 @@ class FriendStateManager {
       return { success: false, error };
     }
   }
-
-  /**
-   * Accept friend request
-   */
   async acceptRequest(maYeuCau, userId) {
     try {
       await api.post(`/trendy/friends/${maYeuCau}/accept`);
@@ -146,10 +103,6 @@ class FriendStateManager {
       return { success: false, error };
     }
   }
-
-  /**
-   * Clear all states
-   */
   clear() {
     this.friendStates = {};
   }

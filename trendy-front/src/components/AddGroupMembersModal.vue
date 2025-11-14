@@ -7,7 +7,6 @@
       </div>
 
       <div class="modal-body">
-        <!-- Search input -->
         <div class="search-container">
           <input
             v-model="searchQuery"
@@ -17,7 +16,6 @@
           />
         </div>
 
-        <!-- Friend list -->
         <div class="friend-list">
           <div v-if="isLoading" class="empty-state">Loading friends...</div>
 

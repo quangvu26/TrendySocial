@@ -1,8 +1,3 @@
-/**
- * Centralized Validation Utilities
- * Sử dụng chung cho tất cả validation logic
- */
-
 export const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return email && emailRegex.test(email);

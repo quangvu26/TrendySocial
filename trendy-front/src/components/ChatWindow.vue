@@ -4,7 +4,6 @@
       class="px-4 py-3 border-b flex items-center justify-between hover:bg-gray-50 transition-colors"
     >
       <div class="flex items-center space-x-3">
-        <!-- Back button for mobile -->
         <button
           @click.stop="$emit('back-to-list')"
           class="sm:hidden p-2 hover:bg-gray-100 rounded -mx-2"
@@ -37,7 +36,7 @@
           <div class="font-semibold">
             {{ chat?.name || "Chọn cuộc trò chuyện" }}
           </div>
-          <!-- Hiển thị ID cho solo chat thôi -->
+
           <div v-if="chat?.type === 'private'" class="text-xs text-gray-400">
             {{ chat?.id ? "@" + chat.id : "" }}
           </div>
@@ -57,7 +56,6 @@
           {{ friendButtonText }}
         </button>
 
-        <!-- Three dots menu button -->
         <button
           @click="toggleChatMenu"
           ref="menuButton"
@@ -92,7 +90,6 @@
           </button>
         </div>
 
-        <!-- Show only first pinned if collapsed -->
         <div
           v-if="!showAllPinned && pinnedMessages.length > 0"
           class="space-y-1"
@@ -118,7 +115,6 @@
           </div>
         </div>
 
-        <!-- Show all pinned if expanded -->
         <div v-else class="space-y-1 max-h-40 sm:max-h-60 overflow-y-auto">
           <div
             v-for="msg in pinnedMessages"
@@ -161,7 +157,6 @@
         :class="m.outgoing ? 'justify-end' : 'justify-start'"
         class="flex items-end mb-4 group relative"
       >
-        <!-- Avatar bên trái (tin nhắn đến) -->
         <img
           v-if="!m.outgoing"
           :src="avatar"
@@ -169,7 +164,6 @@
         />
 
         <div :class="m.outgoing ? 'ml-auto' : ''" class="max-w-[70%]">
-          <!-- Reply Quote - Click để nhảy tới tin nhắn gốc -->
           <div
             v-if="m.replyToId || m.replyTo"
             class="text-xs bg-gray-100 p-2 rounded-t mb-1 border-l-4 border-orange-500 cursor-pointer hover:bg-orange-50 transition-colors"
@@ -186,7 +180,6 @@
             </div>
           </div>
 
-          <!-- Message bubble -->
           <div
             :class="
               m.outgoing
@@ -209,7 +202,6 @@
             </div>
           </div>
 
-          <!-- Reactions -->
           <div
             v-if="m.reactions && m.reactions.length > 0"
             class="flex space-x-1 mt-1 flex-wrap"
@@ -230,7 +222,76 @@
             </div>
           </div>
 
-          <!-- Seen indicator (for outgoing messages) -->
+          <div v-if="m.attachments" class="mt-3 space-y-2">
+            <div
+              v-for="(att, idx) in (() => {
+                try {
+                  const parsed = JSON.parse(m.attachments || '[]');
+                  return Array.isArray(parsed) ? parsed : [];
+                } catch {
+                  return [];
+                }
+              })()"
+              :key="idx"
+            >
+              <div v-if="isImage(att.name)" class="relative group inline-block">
+                <img
+                  :src="att.url"
+                  :alt="att.name"
+                  class="max-w-xs rounded-lg shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+                  @click="viewImage(att.url)"
+                />
+
+                <div
+                  class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <button
+                    @click="viewImage(att.url)"
+                    class="p-2 bg-white rounded-lg shadow-md hover:bg-blue-100"
+                    title="Xem fullscreen"
+                  >
+                    <i class="bi bi-fullscreen text-blue-600"></i>
+                  </button>
+                  <button
+                    @click="downloadFile(att.url, att.name)"
+                    class="p-2 bg-white rounded-lg shadow-md hover:bg-green-100"
+                    title="Tải xuống"
+                  >
+                    <i class="bi bi-download text-green-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div
+                v-else
+                class="bg-gray-100 hover:bg-gray-200 rounded-lg p-3 flex items-center justify-between max-w-xs transition-colors"
+              >
+                <div class="flex items-center space-x-2 flex-1 min-w-0">
+                  <i
+                    class="bi bi-file-earmark text-gray-600 text-lg flex-shrink-0"
+                  ></i>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-800 truncate">
+                      {{ att.name }}
+                    </div>
+                    <div class="text-xs text-gray-600">
+                      {{ formatFileSize(att.size) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex space-x-1 ml-2 flex-shrink-0">
+                  <button
+                    @click="downloadFile(att.url, att.name)"
+                    class="p-2 hover:bg-green-300 rounded"
+                    title="Tải xuống"
+                  >
+                    <i class="bi bi-download text-green-600"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div
             v-if="m.outgoing && m.seenBy && m.seenBy.length > 0"
             class="flex mt-1 -space-x-2"
@@ -244,7 +305,6 @@
             />
           </div>
 
-          <!-- Action buttons below message (show on hover) - FLOATING -->
           <div
             v-if="hoveredMessage === m.id"
             class="absolute flex space-x-1 p-1 bg-white border rounded-lg shadow-md"
@@ -275,7 +335,7 @@
             >
               <i class="bi bi-emoji-smile text-sm text-yellow-600"></i>
             </button>
-            <!-- Nút tùy chọn - hiển thị cho tất cả tin nhắn -->
+
             <button
               @click.stop="showMessageMenuFor(m, $event)"
               class="p-1.5 hover:bg-gray-100 rounded transition-colors"
@@ -286,7 +346,6 @@
           </div>
         </div>
 
-        <!-- Avatar bên phải (tin nhắn gửi) -->
         <img
           v-if="m.outgoing"
           :src="userAvatar"
@@ -295,7 +354,6 @@
       </div>
     </main>
 
-    <!-- Reply preview bar -->
     <div
       v-if="replyingTo"
       class="px-4 py-2 bg-gray-100 border-t flex items-center justify-between"
@@ -352,7 +410,6 @@
       />
     </footer>
 
-    <!-- Group Members Modal -->
     <Teleport to="body">
       <div
         v-if="showGroupMembers"
@@ -405,7 +462,6 @@
       </div>
     </Teleport>
 
-    <!-- Dropdown menu (Teleported to body for proper z-index) -->
     <Teleport to="body">
       <div
         v-if="showChatMenu && chat"
@@ -475,7 +531,6 @@
       </div>
     </Teleport>
 
-    <!-- Message Context Menu -->
     <Teleport to="body">
       <div
         v-if="activeMessageMenu"
@@ -486,7 +541,6 @@
           left: messageMenuPos.left + 'px',
         }"
       >
-        <!-- Ghim/Bỏ ghim - cho cả solo và group -->
         <button
           @click="
             props.chat?.type === 'group'
@@ -506,7 +560,7 @@
               : "Ghim tin nhắn"
           }}
         </button>
-        <!-- Ẩn tin nhắn -->
+
         <button
           @click="hideMessage(messages.find((m) => m.id === activeMessageMenu))"
           class="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center text-sm text-red-600"
@@ -514,7 +568,7 @@
           <i class="bi bi-eye-slash mr-2"></i>
           Ẩn tin nhắn
         </button>
-        <!-- Xóa tin nhắn - chỉ cho tin nhắn của mình -->
+
         <button
           v-if="messages.find((m) => m.id === activeMessageMenu)?.outgoing"
           @click="
@@ -535,7 +589,6 @@
       @added="handleMemberAdded"
     />
 
-    <!-- Quick Reactions Picker -->
     <Teleport to="body">
       <div
         v-if="showQuickReactions"
@@ -550,7 +603,6 @@
             ) + 'px',
         }"
       >
-        <!-- 4 emoji nhanh -->
         <button
           v-for="reaction in quickReactions.slice(0, 4)"
           :key="reaction.name"
@@ -561,7 +613,6 @@
           {{ reaction.emoji }}
         </button>
 
-        <!-- Nút + để mở emoji picker đầy đủ -->
         <button
           @click="showFullEmojiPicker = true"
           class="text-2xl hover:scale-125 transition-transform p-2 cursor-pointer hover:bg-gray-100 rounded font-bold text-gray-600"
@@ -572,7 +623,6 @@
       </div>
     </Teleport>
 
-    <!-- Full Emoji Picker Modal -->
     <Teleport to="body">
       <div
         v-if="showFullEmojiPicker"
@@ -933,7 +983,6 @@ const setupSubscription = async () => {
     // Ensure STOMP connection is active
     let retries = 3;
     while (retries > 0 && !socketService.isConnected()) {
-      console.log(`Waiting for STOMP connection... (${retries} retries left)`);
       await new Promise((r) => setTimeout(r, 500));
       retries--;
     }
@@ -960,8 +1009,6 @@ const setupSubscription = async () => {
       conversationTopic = `/topic/chat/private/${props.chat.maNhomSolo}`;
     }
 
-    console.log("Subscribing to:", conversationTopic);
-
     const client = socketService.getClient();
     if (!client) {
       console.error("STOMP client is null");
@@ -971,16 +1018,11 @@ const setupSubscription = async () => {
     subscription = client.subscribe(conversationTopic, (msg) => {
       try {
         const parsed = JSON.parse(msg.body);
-        console.log("📨 Received message:", parsed);
-        console.log("   - ID:", parsed.maTinNhan);
-        console.log("   - Reply To:", parsed.replyToId);
-        console.log("   - Reply Content:", parsed.replyToContent);
 
         // Check if message already exists (prevent duplicate)
         const messageId = parsed.maTinNhan || parsed.id || Date.now();
         const exists = messages.value.some((m) => m.id === messageId);
         if (exists) {
-          console.log("Message already exists, skipping:", messageId);
           return;
         }
 
@@ -998,9 +1040,9 @@ const setupSubscription = async () => {
           replyToContent: parsed.replyToContent || null,
           replyToSender: parsed.replyToSender || null,
           sender: parsed.maNguoiGui,
+          attachments: parsed.attachments || null, // Load attachments từ WebSocket
         };
 
-        console.log("✅ Adding message with reply:", newMessage);
         messages.value.push(newMessage);
 
         // Force Vue reactivity - deep trigger re-render
@@ -1030,8 +1072,6 @@ const setupSubscription = async () => {
         console.error("Failed to parse message:", e);
       }
     });
-
-    console.log("Subscription setup complete");
   } catch (error) {
     console.error("Failed to setup chat subscription:", error);
   }
@@ -1049,13 +1089,11 @@ watch(
       await cleanupSubscriptions();
 
       if (!newChat) {
-        console.log("No chat selected, clearing messages");
         return;
       }
 
       // Load friend state for private chats
       if (newChat.type === "private" && props.userId) {
-        console.log("📥 Loading friend state for:", newChat.id);
         await loadFriendState(props.userId, newChat.id);
         // Sync with composable state
         isFriend.value = friendButtonIsFriend.value;
@@ -1089,7 +1127,8 @@ watch(
             replyToContent: m.replyToContent,
             replyToSender: m.replyToSender,
             sender: m.maNguoiGui,
-            reactions: m.reactions || [], // Load reactions từ server
+            reactions: m.reactions || [],
+            attachments: m.attachments,
           }));
           const map = new Map();
           [...messages.value, ...serverMsgs].forEach((m) => map.set(m.id, m));
@@ -1110,7 +1149,8 @@ watch(
             replyToContent: m.replyToContent,
             replyToSender: m.replyToSender,
             sender: m.maNguoiGui,
-            reactions: m.reactions || [], // Load reactions từ server
+            reactions: m.reactions || [],
+            attachments: m.attachments,
           }));
           const map = new Map();
           [...messages.value, ...serverMsgs].forEach((m) => map.set(m.id, m));
@@ -1181,7 +1221,6 @@ watch(
   () => friendButtonIsFriend.value,
   (newVal) => {
     isFriend.value = newVal;
-    console.log("📥 Friend state synced:", newVal);
   }
 );
 
@@ -1255,19 +1294,18 @@ const send = async () => {
     // Send message via REST API
     if (props.chat.type === "group") {
       const groupId = props.chat.maNhom || props.chat.id;
-      console.log("📤 Sending group message to:", groupId);
+
       payload.maNhom = groupId;
-      console.log("📦 Group Payload:", JSON.stringify(payload, null, 2));
+
       await chatService.sendGroup(groupId, payload);
     } else {
       payload.maNguoiNhan = props.chat.id;
-      console.log("📦 Private Payload:", JSON.stringify(payload, null, 2));
+
       await chatService.sendPrivate(payload);
     }
 
     // Clear reply state after sending
     replyingTo.value = null;
-    console.log("✅ Message sent, reply cleared");
 
     // Message will be added via WebSocket callback
     emits("sent", payload);
@@ -1292,36 +1330,85 @@ const onPickImage = () => {
   if (fileInput.value) fileInput.value.click();
 };
 
-const onFileSelected = (ev) => {
+const onFileSelected = async (ev) => {
   const files = ev.target.files;
   if (!files || files.length === 0) return;
-  // TODO: implement upload logic; for now append a placeholder message showing filenames
-  for (let i = 0; i < files.length; i++) {
-    messages.value.push({
-      id: Date.now() + i,
-      content: `[File] ${files[i].name}`,
-      time: "",
-      outgoing: true,
-    });
-  }
-  // persist files as well
-  try {
-    const key = `chat-history-${props.chat?.type || "unknown"}-${
-      props.chat?.id
-    }`;
-    const raw = getStorageItem(key);
-    const arr = raw ? JSON.parse(raw) : [];
-    for (let i = 0; i < files.length; i++)
-      arr.push(messages.value[messages.value.length - files.length + i]);
-    setStorageItem(key, JSON.stringify(arr));
-  } catch (e) {}
-  scrollToBottom();
-};
 
-// Toggle menu
+  const user = storage.getUser();
+  if (!user?.id) {
+    alert("Vui lòng đăng nhập trước");
+    return;
+  }
+
+  // Upload and collect all file URLs
+  const attachmentUrls = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", user.id);
+
+      const response = await api.post("/trendy/chat/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.data.success) {
+        const fileUrl = response.data.fileUrl;
+        const fileName = response.data.fileName;
+
+        // Ensure full URL if relative path
+        const fullUrl = fileUrl.startsWith("http")
+          ? fileUrl
+          : `http://localhost:8080${fileUrl}`;
+
+        // Store attachment info
+        attachmentUrls.push({
+          url: fullUrl,
+          name: fileName,
+          size: response.data.fileSize,
+        });
+      }
+    } catch (error) {
+      console.error("❌ Upload failed:", error);
+      alert(`Lỗi upload file ${file.name}: ${error.message}`);
+      return; // Stop if any file fails
+    }
+  }
+
+  // Send message with attachments
+  if (attachmentUrls.length > 0) {
+    const payload = {
+      maNguoiGui: user.id,
+      noiDung: text.value || "", // Bỏ default message, gửi text nếu có
+      attachments: JSON.stringify(attachmentUrls), // Pass as JSON string
+    };
+
+    try {
+      if (props.chat.type === "group") {
+        const groupId = props.chat.maNhom || props.chat.id;
+        payload.maNhom = groupId;
+        await chatService.sendGroup(groupId, payload);
+      } else {
+        payload.maNguoiNhan = props.chat.id;
+        await chatService.sendPrivate(payload);
+      }
+
+      text.value = ""; // Clear input
+
+      scrollToBottom();
+    } catch (error) {
+      console.error("❌ Send failed:", error);
+      alert("Lỗi gửi tin nhắn: " + error.message);
+    }
+  }
+
+  // Reset file input
+  if (fileInput.value) fileInput.value.value = "";
+}; // Toggle menu
 const toggleChatMenu = (event) => {
   event.stopPropagation();
-  console.log("Toggle chat menu. Current state:", showChatMenu.value);
 
   if (!showChatMenu.value && menuButton.value) {
     // Calculate position
@@ -1330,11 +1417,9 @@ const toggleChatMenu = (event) => {
       top: rect.bottom + 8,
       left: rect.right - 192, // 192px = w-48
     };
-    console.log("Menu position:", menuPos.value);
   }
 
   showChatMenu.value = !showChatMenu.value;
-  console.log("New state:", showChatMenu.value);
 };
 
 // Remove reaction helper
@@ -1350,7 +1435,6 @@ const removeReaction = async (messageId, emoji) => {
     }
 
     messages.value = [...messages.value];
-    console.log("✅ Reaction removed from UI:", emoji);
 
     // Persist to localStorage
     try {
@@ -1385,7 +1469,6 @@ const handleFriendHeaderButtonClick = async () => {
   }
 
   // Log action but NO ALERT
-  console.log(`✅ ${result.action} completed successfully`);
 };
 
 // Add friend helper
@@ -1401,8 +1484,6 @@ const addFriend = async () => {
     if (!from) return alert("Không thể lấy user ID từ token");
     const to = props.chat?.id;
     if (!to) return;
-
-    console.log("Sending friend request:", { from, to });
 
     await api.post(`/trendy/friends/request`, {
       from: String(from),
@@ -1459,14 +1540,11 @@ const unfriendUser = async () => {
     const myUserId = payload.userId || payload.sub;
     const friendId = props.chat?.id;
 
-    console.log("🔄 Unfriending:", { myUserId, friendId });
-
     // Call unfriend API directly
     await api.delete("/trendy/friends/unfriend", {
       params: { userId1: myUserId, userId2: friendId },
     });
 
-    console.log("✅ Unfriend successful");
     alert("Đã hủy kết bạn");
 
     // Update friend state
@@ -1487,7 +1565,6 @@ const replyToMessage = (message) => {
   activeMessageMenu.value = null;
   showQuickReactions.value = null;
   text.value = "";
-  console.log("Replying to:", message);
 };
 
 // Scroll to original message when clicking reply preview
@@ -1499,7 +1576,6 @@ const scrollToOriginalMessage = (messageId) => {
     element.scrollIntoView({ behavior: "smooth", block: "center" });
     element.classList.add("ring-2 ring-orange-500");
     setTimeout(() => element.classList.remove("ring-2 ring-orange-500"), 2000);
-    console.log("✅ Scrolled to message:", messageId);
   } else {
     console.warn("Message not found:", messageId);
     alert("Tin nhắn gốc không tìm thấy hoặc đã bị xóa");
@@ -1517,7 +1593,7 @@ const toggleQuickReactions = (message, event) => {
 
   if (showQuickReactions.value === message.id) {
     showQuickReactions.value = null;
-    console.log("❌ Close reactions picker");
+
     return;
   }
 
@@ -1537,7 +1613,6 @@ const toggleQuickReactions = (message, event) => {
 
   showQuickReactions.value = message.id;
   activeMessageMenu.value = null;
-  console.log("✅ Open reactions picker for:", message.id);
 };
 
 const togglePinMessage = async (message) => {
@@ -1552,7 +1627,6 @@ const togglePinMessage = async (message) => {
       pinnedMessages.value = pinnedMessages.value.filter(
         (m) => m.id !== message.id
       );
-      console.log("✅ Message unpinned");
     } else {
       if (pinnedMessages.value.length >= maxPinnedMessages) {
         alert(`Chỉ có thể ghim tối đa ${maxPinnedMessages} tin nhắn`);
@@ -1564,7 +1638,6 @@ const togglePinMessage = async (message) => {
       });
       message.pinned = true;
       pinnedMessages.value.push(message);
-      console.log("✅ Message pinned");
     }
     activeMessageMenu.value = null;
   } catch (error) {
@@ -1590,7 +1663,6 @@ const togglePinPrivateMessage = async (message) => {
       pinnedMessages.value = pinnedMessages.value.filter(
         (m) => m.id !== messageId
       );
-      console.log("✅ Private message unpinned");
     } else {
       // Pin
       if (pinnedMessages.value.length >= maxPinnedMessages) {
@@ -1600,7 +1672,6 @@ const togglePinPrivateMessage = async (message) => {
       await api.post(`/trendy/chat/private/pin/${messageId}`);
       message.pinned = true;
       pinnedMessages.value.push(message);
-      console.log("✅ Private message pinned");
     }
     activeMessageMenu.value = null;
   } catch (error) {
@@ -1624,7 +1695,6 @@ const togglePinGroupMessage = async (message) => {
       pinnedMessages.value = pinnedMessages.value.filter(
         (m) => m.id !== messageId
       );
-      console.log("✅ Group message unpinned");
     } else {
       if (pinnedMessages.value.length >= maxPinnedMessages) {
         alert(`Chỉ có thể ghim tối đa ${maxPinnedMessages} tin nhắn`);
@@ -1633,7 +1703,6 @@ const togglePinGroupMessage = async (message) => {
       await api.post(`/trendy/chat/group/pin/${messageId}`);
       message.pinned = true;
       pinnedMessages.value.push(message);
-      console.log("✅ Group message pinned");
     }
     activeMessageMenu.value = null;
   } catch (error) {
@@ -1652,7 +1721,6 @@ const removePinnedMessage = async (messageId) => {
       ? `/trendy/chat/group/unpin/${messageId}`
       : `/trendy/chat/private/unpin/${messageId}`;
 
-    console.log("📌 Unpinning from:", endpoint);
     await api.post(endpoint);
 
     // Update local state
@@ -1662,7 +1730,6 @@ const removePinnedMessage = async (messageId) => {
     pinnedMessages.value = pinnedMessages.value.filter(
       (m) => m.id !== messageId
     );
-    console.log("✅ Message unpinned from DB");
   } catch (error) {
     console.error("❌ Unpin failed:", error);
     alert(
@@ -1674,7 +1741,6 @@ const removePinnedMessage = async (messageId) => {
 
 // Debug: Log all reactions
 const debugReactions = () => {
-  console.log("🔍 DEBUG REACTIONS:");
   messages.value.forEach((m) => {
     if (m.reactions && m.reactions.length > 0) {
       console.log(
@@ -1711,7 +1777,6 @@ const reactToMessage = async (messageId, reactionName) => {
       }
     }
     emoji = emoji || reactionName;
-    console.log("✅ Emoji resolved:", emoji);
 
     const payload = {
       messageId,
@@ -1724,29 +1789,21 @@ const reactToMessage = async (messageId, reactionName) => {
         ? "/trendy/chat/group/react"
         : "/trendy/chat/private/react";
 
-    console.log("📮 Sending payload:", payload, "to endpoint:", endpoint);
     const response = await api.post(endpoint, payload);
-    console.log("✅ Server response:", response.data);
 
     const msg = messages.value.find((m) => m.id === messageId);
-    console.log("🔍 Found message:", msg ? "YES" : "NO");
 
     if (msg) {
       if (!msg.reactions) msg.reactions = [];
-      console.log("   - Before reaction:", msg.reactions);
 
       const existing = msg.reactions.find((r) => r.emoji === emoji);
       if (existing) {
         existing.count = (existing.count || 1) + 1;
-        console.log("   - Updated existing reaction count to:", existing.count);
       } else {
         msg.reactions.push({ emoji: emoji, count: 1 });
-        console.log("   - Added new reaction:", emoji);
       }
 
-      console.log("   - After reaction:", msg.reactions);
       messages.value = [...messages.value];
-      console.log("✅ messages.value updated, total:", messages.value.length);
 
       // Persist to localStorage
       try {
@@ -1754,7 +1811,6 @@ const reactToMessage = async (messageId, reactionName) => {
           props.chat?.id
         }`;
         setStorageItem(key, JSON.stringify(messages.value));
-        console.log("✅ Saved to localStorage key:", key);
       } catch (e) {
         console.error("❌ Failed to save to localStorage:", e);
       }
@@ -1794,6 +1850,18 @@ const getEmojiName = (emoji) => {
   return emojiNames[emoji] || emoji;
 };
 
+// Extract filename from message content
+const extractFileName = (content) => {
+  const match = content.match(/\[📎\s*(.+?)\]/);
+  return match ? match[1] : "File";
+};
+
+// Extract file URL from message content
+const extractFileUrl = (content) => {
+  const lines = content.split("\n");
+  return lines.length > 1 ? lines[1].trim() : "";
+};
+
 // Handle message hover
 const handleMessageHover = (messageId) => {
   clearTimeout(hoverTimeout);
@@ -1810,13 +1878,12 @@ const handleMessageLeave = () => {
 // Handle member added to group
 const handleMemberAdded = (newMembers) => {
   groupMembers.value = newMembers;
-  console.log("✅ Members updated:", newMembers.length);
 };
 
 // Navigate to user profile
 const goToUserProfile = (userId) => {
   if (!userId || userId === props.userId) return;
-  console.log("🔗 Emitting viewUserProfile for:", userId);
+
   emits("viewUserProfile", userId);
 };
 
@@ -1825,24 +1892,16 @@ const deleteMessage = async (messageId) => {
   if (!confirm("Xóa tin nhắn này?")) return;
   try {
     const msg = messages.value.find((m) => m.id === messageId);
-    console.log("🗑️ Message to delete:", msg);
-    console.log("🗑️ Message ID:", messageId);
-    console.log("🗑️ Message ID type:", typeof messageId);
 
     const isGroup = props.chat?.type === "group";
     const endpoint = isGroup
       ? `/trendy/chat/group/message/${messageId}`
       : `/trendy/chat/private/message/${messageId}`;
 
-    console.log("🗑️ Chat type:", isGroup ? "group" : "private");
-    console.log("🗑️ Endpoint:", endpoint);
-    console.log("🗑️ UserId:", props.userId);
-
     const response = await api.delete(endpoint, {
       params: { userId: props.userId },
     });
 
-    console.log("✅ Server response:", response.data);
     messages.value = messages.value.filter((m) => m.id !== messageId);
     console.log(
       "✅ Message deleted permanently, remaining:",
@@ -1903,7 +1962,6 @@ const hideMessage = async (message) => {
       setStorageItem(key, JSON.stringify(messages.value));
     } catch (e) {}
 
-    console.log("✅ Message hidden");
     activeMessageMenu.value = null;
   } catch (error) {
     console.error("Hide failed:", error);
@@ -1935,7 +1993,83 @@ const showMessageMenuFor = (message, event) => {
   }
 
   messageMenuPos.value = { top, left };
-  console.log("📋 Message menu opened for:", message.id, "at:", { top, left });
+};
+
+// Check if file is image
+const isImage = (fileName) => {
+  if (!fileName) return false;
+  const imageExts = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageExts.some((ext) => fileName.toLowerCase().endsWith(ext));
+};
+
+// Format file size
+const formatFileSize = (bytes) => {
+  if (!bytes) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+};
+
+// Download file helper - proper method
+const downloadFile = (url, fileName) => {
+  try {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const link = document.createElement("a");
+        const blobUrl = window.URL.createObjectURL(blob);
+        link.href = blobUrl;
+        link.download = fileName || "file";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error("❌ Download error:", error);
+        alert("Lỗi tải file: " + error.message);
+      });
+  } catch (error) {
+    console.error("❌ Download error:", error);
+    alert("Lỗi tải file");
+  }
+};
+
+// View image in new tab
+const viewImage = (url) => {
+  window.open(url, "_blank");
+};
+
+// Format last message for preview (show file/image indicator)
+const formatLastMessagePreview = (message) => {
+  if (!message) return "Không có tin nhắn";
+
+  if (message.attachments) {
+    try {
+      const attachments =
+        typeof message.attachments === "string"
+          ? JSON.parse(message.attachments)
+          : message.attachments;
+
+      if (Array.isArray(attachments) && attachments.length > 0) {
+        const hasImage = attachments.some((a) => isImage(a.name));
+        if (hasImage) {
+          return message.outgoing
+            ? "Bạn đã gửi hình ảnh"
+            : `${message.senderName || "Họ"} đã gửi hình ảnh`;
+        } else {
+          return message.outgoing
+            ? `Bạn đã gửi ${attachments.length} file`
+            : `${message.senderName || "Họ"} đã gửi ${attachments.length} file`;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to parse attachments in preview:", e);
+    }
+  }
+
+  return message.content || "Không có tin nhắn";
 };
 </script>
 

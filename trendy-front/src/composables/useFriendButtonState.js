@@ -3,15 +3,6 @@ import { ref, computed } from "vue";
 import api from "../api/api";
 import { storage } from "../utils/storage";
 
-/**
- * ⚠️ DEPRECATED - Use useHeaderButtonState.js instead
- *
- * This file is kept for reference only.
- * All functionality has been consolidated into useHeaderButtonState.js
- *
- * Import from: ../composables/useHeaderButtonState.js
- */
-
 export const useFriendButtonState = () => {
   console.warn(
     "⚠️ useFriendButtonState is deprecated. Use useHeaderButtonState instead"
@@ -102,7 +93,7 @@ export const useFriendButtonState = () => {
       });
 
       friendState.value = "pending";
-      console.log("✅ Friend request sent");
+
       return true;
     } catch (err) {
       console.error("Send request failed:", err);
@@ -138,7 +129,7 @@ export const useFriendButtonState = () => {
       if (request) {
         await api.post(`/trendy/friends/${request.maYeuCau}/reject`);
         friendState.value = "none";
-        console.log("✅ Friend request cancelled");
+
         return true;
       } else {
         error.value = "Không tìm thấy lời mời để hủy";
@@ -171,7 +162,7 @@ export const useFriendButtonState = () => {
       });
 
       friendState.value = "none";
-      console.log("✅ Unfriended successfully");
+
       return true;
     } catch (err) {
       console.error("Unfriend failed:", err);

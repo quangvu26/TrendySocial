@@ -1,6 +1,5 @@
 <template>
   <div class="emoji-picker-wrapper">
-    <!-- Dots button to trigger emoji picker -->
     <button
       @click.stop="toggleFullPicker"
       class="emoji-dots-btn"
@@ -9,7 +8,6 @@
       ⋯
     </button>
 
-    <!-- Full Emoji Picker Modal -->
     <teleport to="body">
       <transition name="fade">
         <div
@@ -146,7 +144,6 @@ const closeFullPicker = () => {
 };
 
 const selectEmoji = (emoji) => {
-  console.log("😊 Selected emoji:", emoji);
   emit("react", emoji);
   closeFullPicker();
 };

@@ -16,7 +16,6 @@ class NotificationService {
       };
 
       await api.post("/trendy/notification", notification);
-      console.log("✅ Message notification created");
     } catch (error) {
       console.error("Failed to create notification:", error);
     }
@@ -43,7 +42,6 @@ class NotificationService {
   async markAsRead(notificationId) {
     try {
       await api.put(`/trendy/notification/${notificationId}/read`);
-      console.log("✅ Notification marked as read");
     } catch (error) {
       console.error("Failed to mark notification as read:", error);
     }

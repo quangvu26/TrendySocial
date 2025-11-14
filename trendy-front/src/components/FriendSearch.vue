@@ -48,7 +48,6 @@
           </div>
 
           <div class="mt-4 flex space-x-2">
-            <!-- Message button - white with border, hover orange -->
             <button
               @click="startChat"
               class="flex items-center px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-[#FF5630] hover:border-[#FF5630] hover:text-white transition duration-200"
@@ -57,7 +56,6 @@
               Nhắn tin
             </button>
 
-            <!-- Add friend button - orange by default, white on hover -->
             <button
               @click="addFriend"
               :disabled="requestSent"
